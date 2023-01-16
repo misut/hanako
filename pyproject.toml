@@ -16,6 +16,8 @@ repository = "https://github.com/misut/hanako.git"
 python = "^3.10"
 kivy = {extras = ["base"], version = "^2.1.0"}
 pydantic = "^1.10.4"
+js2py = "^0.74"
+loguru = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -24,6 +26,7 @@ isort = "^5.11.4"
 pylint = "^2.15.9"
 mypy = "^0.991"
 pytest = "^7.2.0"
+pytest-asyncio = "^0.20.3"
 
 
 [tool.poetry.scripts]

@@ -1,4 +1,5 @@
-from kivy.uix.actionbar import ActionBar, ActionButton, ActionView, ActionPrevious
+from kivy.uix.actionbar import (ActionBar, ActionButton, ActionPrevious,
+                                ActionView)
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
