@@ -18,6 +18,9 @@ class HitomiFile(ValueObject):
     height: int
     hash: str
 
+    hasavif: bool | None
+    haswebp: bool | None
+
 
 class HitomiGallery(ValueObject):
     id: str

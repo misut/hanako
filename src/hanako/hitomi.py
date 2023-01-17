@@ -1,16 +1,11 @@
 import asyncio
+from typing import Literal
 
 import js2py
 from kivy.network.urlrequest import UrlRequest
 from loguru import logger
 
-from hanako.models import HitomiGallery
-
-header = {
-    "referer": "https://hitomi.la/reader/1234567.html",
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.3",
-}
+from hanako.models import HitomiGallery, HitomiFile
 
 
 def log_on_success(*_) -> None:
@@ -24,7 +19,61 @@ async def load_gallery(gallery_id: str) -> HitomiGallery:
     return HitomiGallery(**js2py.eval_js(req.result).to_dict())
 
 
-async def download_gallery(*_) -> None:
-    url = ""
-    req = UrlRequest(url)
+async def generate_download_url(file: HitomiFile) -> str:
+    req = UrlRequest("https://ltn.hitomi.la/gg.js")
     await asyncio.to_thread(req.wait)
+    gg = js2py.eval_js(req.result)
+
+    def determine_extension(file: HitomiFile) -> Literal["avif", "webp"]:
+        if file.hasavif:
+            return "avif"
+        if file.haswebp:
+            return "webp"
+
+        raise ValueError(f"Not supported file: {file}")
+
+    def determine_filename(file: HitomiFile) -> str:
+        if file.hash == "":
+            return file.name
+
+        return file.hash
+
+    def determine_route(file: HitomiFile, gg: js2py.base.JsObjectWrapper) -> str:
+        g = file.hash[-3:]
+
+        return f"{gg.b}{gg.s(g)}"
+
+    def determine_subdomain(file: HitomiFile, gg: js2py.base.JsObjectWrapper) -> str:
+        g = file.hash[-3:]
+
+        return chr(97 + gg.m(int(gg.s(g))))
+
+    extension = determine_extension(file)
+    filename = determine_filename(file)
+    route = determine_route(file, gg)
+    subdomain = determine_subdomain(file, gg)
+
+    return f"https://{subdomain}a.hitomi.la/{extension}/{route}/{filename}.{extension}"
+
+
+async def download_file(file: HitomiFile, header: dict[str, str]) -> None:
+    url = await generate_download_url(file)
+    logger.info(f"download({file.name}): {url}")
+    req = UrlRequest(
+        url,
+        on_success=log_on_success,
+        req_headers=header,
+        timeout=3,
+        file_path=f"wow/{file.name}",
+        user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
+    )
+    await asyncio.to_thread(req.wait)
+
+
+async def download_gallery(gallery: HitomiGallery) -> None:
+    header = {
+        "referer": f"https://hitomi.la/reader/{gallery.id}.html",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    }
+    for file in gallery.files:
+        await download_file(file, header)

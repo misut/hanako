@@ -16,3 +16,7 @@ async def test_load_gallery(expected_id: str, expected_title: str) -> None:
     gallery = await hitomi.load_gallery(expected_id)
     assert gallery.id == expected_id
     assert gallery.title == expected_title
+
+    url = await hitomi.generate_download_url(gallery.files[0])
+    await hitomi.download_gallery(gallery)
+    assert url is None
