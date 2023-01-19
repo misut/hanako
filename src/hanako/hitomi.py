@@ -1,4 +1,5 @@
 import asyncio
+from struct import unpack
 from typing import Literal
 
 import js2py
@@ -77,3 +78,18 @@ async def download_gallery(gallery: HitomiGallery) -> None:
     }
     for file in gallery.files:
         await download_file(file, header)
+
+
+async def load_gallery_ids() -> list[str]:
+    url = "https://ltn.hitomi.la/index-english.nozomi"
+
+    req = UrlRequest(
+        url,
+        timeout=3,
+        method="GET",
+        on_success=log_on_success,
+    )
+    await asyncio.to_thread(req.wait)
+
+    ttl_bytes = len(req.result) // 4
+    return [str(id) for id in unpack(f">{ttl_bytes}i", req.result)]
