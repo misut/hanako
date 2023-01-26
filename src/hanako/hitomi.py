@@ -15,13 +15,13 @@ def log_on_success(*_) -> None:
 
 async def load_gallery(gallery_id: str) -> HitomiGallery:
     url = f"https://ltn.hitomi.la/galleries/{gallery_id}.js"
-    req = UrlRequest(url, on_success=log_on_success)
+    req = UrlRequest(url=url, on_success=log_on_success)
     await asyncio.to_thread(req.wait)
     return HitomiGallery(**js2py.eval_js(req.result).to_dict())
 
 
 async def generate_download_url(file: HitomiFile) -> str:
-    req = UrlRequest("https://ltn.hitomi.la/gg.js")
+    req = UrlRequest(url="https://ltn.hitomi.la/gg.js")
     await asyncio.to_thread(req.wait)
     gg = js2py.eval_js(req.result)
 
@@ -57,13 +57,13 @@ async def generate_download_url(file: HitomiFile) -> str:
     return f"https://{subdomain}a.hitomi.la/{extension}/{route}/{filename}.{extension}"
 
 
-async def download_file(file: HitomiFile, header: dict[str, str]) -> None:
+async def download_file(file: HitomiFile, headers: dict[str, str]) -> None:
     url = await generate_download_url(file)
     logger.info(f"download({file.name}): {url}")
     req = UrlRequest(
-        url,
+        url=url,
         on_success=log_on_success,
-        req_headers=header,
+        req_headers=headers,
         timeout=3,
         file_path=f"wow/{file.name}",
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0",
@@ -72,22 +72,31 @@ async def download_file(file: HitomiFile, header: dict[str, str]) -> None:
 
 
 async def download_gallery(gallery: HitomiGallery) -> None:
-    header = {
+    headers = {
         "referer": f"https://hitomi.la/reader/{gallery.id}.html",
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
     }
     for file in gallery.files:
-        await download_file(file, header)
+        await download_file(file, headers)
 
 
-async def load_gallery_ids() -> list[str]:
-    url = "https://ltn.hitomi.la/index-english.nozomi"
+async def load_gallery_ids(
+    page: int = 0, item: int = 25, language: str = "all"
+) -> list[str]:
+    byte_beg = page * item * 4
+    byte_end = byte_beg + item * 4 - 1
+    headers = {
+        "origin": "https://hitomi.la",
+        "Range": f"bytes={byte_beg}-{byte_end}",
+    }
+    url = f"https://ltn.hitomi.la/index-{language}.nozomi"
 
     req = UrlRequest(
-        url,
+        url=url,
         timeout=3,
         method="GET",
         on_success=log_on_success,
+        req_headers=headers,
     )
     await asyncio.to_thread(req.wait)
 

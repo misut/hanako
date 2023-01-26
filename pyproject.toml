@@ -30,7 +30,7 @@ pytest-asyncio = "^0.20.3"
 
 
 [tool.poetry.scripts]
-hanako = "hanako:run"
+hanako = "hanako.main:run"
 
 
 [tool.poe.tasks]
