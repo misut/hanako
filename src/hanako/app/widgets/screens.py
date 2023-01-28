@@ -1,28 +1,19 @@
 from collections.abc import Callable
 
 from kivy.effects.scroll import ScrollEffect
-from kivy.graphics.svg import Svg
 from kivy.metrics import dp
 from kivy.properties import Property
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.scatterlayout import Scatter, ScatterLayout
+from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.screenmanager import Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 
-
-class SvgWidget(Scatter):
-    def __init__(self, source: str, scale: float = 1.0, **kwargs):
-        super().__init__(**kwargs)
-        with self.canvas:
-            self._svg = Svg(source=source, color=(0, 0, 0, 1))
-
-        self.scale_to(scale)
-
-    def scale_to(self, val: float) -> None:
-        self.scale = val
-        self.size = self._svg.width, self._svg.height
+from hanako.app.widgets.base import MessageDispatcher
+from hanako.command import commands
 
 
 def fit_into_parent(
@@ -38,7 +29,7 @@ def fit_into_parent(
     return resize
 
 
-class MainScreen(Screen):
+class HomeScreen(Screen):
     class LibraryView(ScrollView):
         def __init__(self) -> None:
             super().__init__(
@@ -73,46 +64,61 @@ class MainScreen(Screen):
             )
             self.bind(pos=fit_into_parent(0.0, 1.0, dp(60), 0.0))
 
-            layout = ScatterLayout(size_hint=(None, None))
+            layout = RelativeLayout(size_hint=(None, None))
             layout.bind(pos=fit_into_parent(0.0, 1.0, dp(60), 0.0))
             self.add_widget(layout)
-            print(f"layout size: {layout.size}")
 
-            home = SvgWidget(
-                source="resources/icon_home.svg",
-                pos=(dp(16), layout.height - dp(46)),
+            home = Image(
+                source="resources/drawables/icon_home.png",
+                allow_stretch=True,
+                color=(0, 0, 0, 1),
+                mipmap=True,
+                pos=(dp(16), layout.height - dp(48)),
+                size_hint=(None, None),
+                size=(dp(24), dp(24)),
             )
-            home.scale_to(1.0)
-            print(home.size)
             layout.add_widget(home)
 
-            search = SvgWidget(
-                source="resources/icon_search.svg",
-                pos=(dp(16), layout.height - dp(102)),
+            search = Image(
+                source="resources/drawables/icon_search.png",
+                allow_stretch=True,
+                color=(0, 0, 0, 1),
+                mipmap=True,
+                pos=(dp(16), layout.height - dp(96)),
+                size_hint=(None, None),
+                size=(dp(24), dp(24)),
             )
-            search.scale_to(1.0)
             layout.add_widget(search)
 
     def __init__(self) -> None:
-        super().__init__(name="main")
+        super().__init__(name="home")
 
-        layout = ScatterLayout(size_hint=(1.0, 1.0))
+        layout = RelativeLayout(size_hint=(1.0, 1.0))
         self.add_widget(layout)
 
-        library = MainScreen.LibraryView()
+        library = HomeScreen.LibraryView()
         layout.add_widget(library)
 
-        sidebar = MainScreen.SidebarView()
+        sidebar = HomeScreen.SidebarView()
         layout.add_widget(sidebar)
 
 
-class ThumbnailDetailWidget(ScatterLayout):
+class ThumbnailDetailWidget(ButtonBehavior, MessageDispatcher, RelativeLayout):
+    thumbnail: Image
+
     def __init__(self, num: int) -> None:
         super().__init__(size_hint=(1.0, 1.0))
 
-        missing = SvgWidget(source="resources/icon_image.svg", pos=(dp(30), dp(16)))
-        missing.scale_to(2.0)
-        self.add_widget(missing)
+        self.thumbnail = Image(
+            source="resources/drawables/icon_image.png",
+            allow_stretch=True,
+            color=(0, 0, 0, 1),
+            mipmap=True,
+            pos=(dp(32), dp(8)),
+            size_hint=(None, None),
+            size=(dp(48), dp(48)),
+        )
+        self.add_widget(self.thumbnail)
 
         title = Label(
             text=f"Hello, world! #{num}",
@@ -133,3 +139,7 @@ class ThumbnailDetailWidget(ScatterLayout):
         )
         description.bind(size=description.setter("text_size"))
         self.add_widget(description)
+
+    def on_press(self) -> None:
+        command = commands.FetchMangaIDs(offset=0, limit=10, triggered_by="thumbnail")
+        self.dispatch("on_command", command)

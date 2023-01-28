@@ -1,7 +1,7 @@
 import asyncio
 
-from hanako.interface import app
+from hanako import app
 
 
 def run(debug: bool = True) -> None:
-    asyncio.run(app.MainApp().async_run(async_lib="asyncio"), debug=debug)
+    asyncio.run(app.Hanako().async_run(), debug=debug)
