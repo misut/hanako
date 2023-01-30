@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+from kivy.core.window import Window
 from kivy.effects.scroll import ScrollEffect
 from kivy.metrics import dp
 from kivy.properties import Property
@@ -64,22 +65,21 @@ class HomeScreen(Screen):
             )
             self.bind(pos=fit_into_parent(0.0, 1.0, dp(60), 0.0))
 
-            layout = RelativeLayout(size_hint=(None, None))
-            layout.bind(pos=fit_into_parent(0.0, 1.0, dp(60), 0.0))
+            layout = RelativeLayout(pos_hint={"x": 0.0, "y": 0.0}, size_hint=(1.0, 1.0))
             self.add_widget(layout)
 
-            home = Image(
+            home_button = Image(
                 source="resources/drawables/icon_home.png",
                 allow_stretch=True,
                 color=(0, 0, 0, 1),
                 mipmap=True,
-                pos=(dp(16), layout.height - dp(48)),
+                pos=(dp(16), Window.height - dp(48)),
                 size_hint=(None, None),
                 size=(dp(24), dp(24)),
             )
-            layout.add_widget(home)
+            layout.add_widget(home_button)
 
-            search = Image(
+            search_button = Image(
                 source="resources/drawables/icon_search.png",
                 allow_stretch=True,
                 color=(0, 0, 0, 1),
@@ -88,12 +88,34 @@ class HomeScreen(Screen):
                 size_hint=(None, None),
                 size=(dp(24), dp(24)),
             )
-            layout.add_widget(search)
+            layout.add_widget(search_button)
+
+            filter_button = Image(
+                source="resources/drawables/icon_filter.png",
+                allow_stretch=True,
+                color=(0, 0, 0, 1),
+                mipmap=True,
+                pos=(dp(16), layout.height - dp(144)),
+                size_hint=(None, None),
+                size=(dp(24), dp(24)),
+            )
+            layout.add_widget(filter_button)
+
+            settings_button = Image(
+                source="resources/drawables/icon_settings.png",
+                allow_stretch=True,
+                color=(0, 0, 0, 1),
+                mipmap=True,
+                pos=(dp(16), dp(16)),
+                size_hint=(None, None),
+                size=(dp(24), dp(24)),
+            )
+            layout.add_widget(settings_button)
 
     def __init__(self) -> None:
         super().__init__(name="home")
 
-        layout = RelativeLayout(size_hint=(1.0, 1.0))
+        layout = RelativeLayout(pos_hint={"x": 0.0, "y": 0.0}, size_hint=(1.0, 1.0))
         self.add_widget(layout)
 
         library = HomeScreen.LibraryView()

@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import Any, Generic, TypeVar
 
+E = TypeVar("E")
 T = TypeVar("T")
 U = TypeVar("U")
 
@@ -33,10 +34,10 @@ class Option(Generic[T]):
     def map(self, func: Callable[[T], U]) -> "Option[U]":
         return Option[U](None) if self._value is None else Option[U](func(self._value))
 
-    def map_or(self, func: Callable[[T], U], default: U) -> U:
+    def map_or(self, default: U, func: Callable[[T], U]) -> U:
         return default if self._value is None else func(self._value)
 
-    def map_or_else(self, func: Callable[[T], U], default: Callable[[], U]) -> U:
+    def map_or_else(self, default: Callable[[], U], func: Callable[[T], U]) -> U:
         return default() if self._value is None else func(self._value)
 
     def filter(self, predicate: Callable[[T], bool]) -> "Option[T]":
@@ -62,5 +63,33 @@ class Option(Generic[T]):
         return "None" if self._value is None else f"Some({self._value})"
 
 
-SOME = Option
-NONE = Option[Any](None)
+Some = Option
+Null = Option[Any](None)
+
+
+class Result(Generic[T, E]):
+    _ok: T | None
+    _err: E | None
+
+    def __init__(self, ok: T | None, err: None | E) -> None:
+        assert ok and err
+        assert not ok and not err
+        self._ok = ok
+        self._err = err
+
+    def __bool__(self) -> bool:
+        return self.is_ok()
+
+    def is_ok(self) -> bool:
+        return self._ok is not None
+
+    def is_err(self) -> bool:
+        return self._err is not None
+
+
+def Ok(value: T) -> Result[T, E]:
+    return Result[T, E](ok=value, err=None)
+
+
+def Err(value: E) -> Result[T, E]:
+    return Result[T, E](ok=None, err=value)

@@ -3,8 +3,8 @@ from collections.abc import Callable, Awaitable
 from typing import TypeVar
 
 from hanako.collections import FrozenDict
-from hanako.command.commands import Command
 from hanako.command.context import CommandContext
+from hanako.models import Command
 
 SubCommand = TypeVar("SubCommand", bound=Command)
 CommandResult = TypeVar("CommandResult")
@@ -45,9 +45,9 @@ class CommandHandler(FrozenDict[type, CommandOperator]):
     def new(cls, *operators: CommandOperator) -> "CommandHandler":
         mapping = {}
         for operator in operators:
-            tpl = cls._create_tpl(operator)
-            assert tpl[0] in mapping, f"'{tpl[0].__name__}' should not be duplicated."
-            mapping[tpl[0]] = tpl[1]
+            tp, op = cls._create_tpl(operator)
+            assert tp not in mapping, f"'{tp.__name__}' should not be duplicated."
+            mapping[tp] = op
 
         return cls(mapping)
 
@@ -64,7 +64,4 @@ class CommandHandler(FrozenDict[type, CommandOperator]):
             operator = self[type(command)]
         except KeyError as err:
             raise OperatorNotFoundError() from err
-
-        result = await operator(command, context)
-
-        return result
+        return await operator(command, context)

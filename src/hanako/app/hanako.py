@@ -4,37 +4,34 @@ from kivy.app import App
 from loguru import logger
 
 from hanako.app import widgets
-from hanako.drivers import Subscriber
-from hanako.interfaces import Message, Receiver
+from hanako.command import command_handler, commands, CommandContext
+from hanako.interfaces import Message, MessageReceiver
 
-DEFAULT_TIMEOUT: float = 1.0
+INCOMMING_MESSAGE_TIMEOUT: float = 1.0
 
 
-async def process_once(incomming: Message) -> None:
-    print(incomming)
+async def process_message(message: Message, command_context: CommandContext) -> None:
+    command_cls = getattr(commands, message.type)
+    command = command_cls.parse_raw(message.data)
+    await command_handler.handle(command, command_context)
 
 
 class Hanako(App):
-    _subscriber: Receiver
+    _command_context: CommandContext
+    _subscriber: MessageReceiver | None
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, command_context: CommandContext):
+        super().__init__()
 
-        self._subscriber = Subscriber()
+        self._command_context = command_context
+        self._subscriber = None
 
-    async def process(self, timeout: float = DEFAULT_TIMEOUT) -> None:
-        try:
-            while True:
-                incomming = self._subscriber.receive(timeout)
-                if not incomming:
-                    # logger.debug("No incomming messages.")
-                    await asyncio.sleep(0.1)
-                    continue
+    def bind(self, subscriber: MessageReceiver) -> None:
+        assert not self._subscriber, "Subscriber has been already bound."
+        self._subscriber = subscriber
 
-                await process_once(incomming.unwrap())
-                logger.debug("Processed.")
-        except asyncio.CancelledError:
-            logger.info("Canceled.")
+    def build(self) -> widgets.RootWidget:
+        return widgets.RootWidget()
 
     async def async_run_with(self, *futures: asyncio.Future) -> None:
         await super().async_run("asyncio")
@@ -47,5 +44,19 @@ class Hanako(App):
 
         await asyncio.gather(self.async_run_with(processor), processor)
 
-    def build(self) -> widgets.RootWidget:
-        return widgets.RootWidget()
+    async def process_once(self) -> None:
+        assert self._subscriber, "Subscriber is not bound."
+        incomming = self._subscriber.receive(INCOMMING_MESSAGE_TIMEOUT)
+        if not incomming:
+            return
+
+        await process_message(incomming.unwrap(), self._command_context)
+        logger.debug("Processed.")
+
+    async def process(self) -> None:
+        try:
+            while True:
+                await self.process_once()
+                await asyncio.sleep(1.0)
+        except asyncio.CancelledError:
+            logger.info("Canceled.")

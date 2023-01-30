@@ -10,11 +10,7 @@ class RootWidget(ScreenManager):
         super().__init__(**kwargs)
 
         self.add_widget(HomeScreen())
-
-        self.bind(
-            pos=self.update_background,
-            size=self.update_background,
-        )
+        self.bind(size=self.update_background)
         with self.canvas.before:
             Color(1, 1, 1, 1)
             self.rect = Rectangle(size=self.size)

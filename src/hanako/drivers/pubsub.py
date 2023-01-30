@@ -1,7 +1,7 @@
 from typing import ClassVar
 
 from hanako.drivers.in_memory_message_queue import InMemoryMessageQueue
-from hanako.interfaces import Message, Receiver, Sender
+from hanako.interfaces import Message, MessageReceiver, MessageSender
 from hanako.monads import Option
 
 
@@ -15,8 +15,8 @@ class _Singleton:
         return cls._instance
 
 
-class Publisher(Sender):
-    _engine: Sender
+class Publisher(MessageSender):
+    _engine: MessageSender
     _triggered_by: str
 
     def __init__(self, triggered_by: str = "") -> None:
@@ -35,8 +35,8 @@ class Publisher(Sender):
         self._engine.send(stamped)
 
 
-class Subscriber(Receiver):
-    _engine: Receiver
+class Subscriber(MessageReceiver):
+    _engine: MessageReceiver
 
     def __init__(self) -> None:
         self._engine = _Singleton.get_instance()

@@ -1,12 +1,12 @@
 from kivy.event import EventDispatcher
 
 from hanako.drivers import Publisher
-from hanako.interfaces import Message, Sender
+from hanako.interfaces import Message, MessageSender
 from hanako.models import Command
 
 
 class MessageDispatcher(EventDispatcher):
-    _publisher: Sender
+    _publisher: MessageSender
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)

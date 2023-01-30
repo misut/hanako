@@ -6,6 +6,8 @@ now = datetime.now
 
 DefaultDatetimeField = pydantic.Field(default_factory=now)
 
+IDType = str
+
 
 def milliseconds_encoding(dt: datetime) -> str:
     return dt.isoformat(timespec="milliseconds")
@@ -27,6 +29,11 @@ class ValueObject(ImmutableModel):
 
 class Command(ImmutableModel):
     triggered_by: str = ""
+
+
+class Context(ImmutableModel):
+    class Config:
+        frozen = True
 
 
 class HitomiFile(ValueObject):
