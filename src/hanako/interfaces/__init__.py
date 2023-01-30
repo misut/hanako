@@ -1,7 +1,7 @@
 from hanako.interfaces.manga import Manga, MangaPage, MangaService, MangaTag
 from hanako.interfaces.message import Message, MessageReceiver, MessageSender
 
-__all__ = [
+__all__ = (
     "Manga",
     "MangaPage",
     "MangaService",
@@ -9,4 +9,4 @@ __all__ = [
     "Message",
     "MessageReceiver",
     "MessageSender",
-]
+)

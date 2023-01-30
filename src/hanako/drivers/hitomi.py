@@ -1,6 +1,6 @@
 import asyncio
-from typing import cast, Literal
 from struct import unpack
+from typing import Literal, cast
 
 import js2py
 from kivy.network.urlrequest import UrlRequest

@@ -3,8 +3,8 @@ import asyncio
 from kivy.app import App
 from loguru import logger
 
-from hanako.app import widgets
-from hanako.command import command_handler, commands, CommandContext
+from hanako.app import uix
+from hanako.command import CommandContext, command_handler, commands
 from hanako.interfaces import Message, MessageReceiver
 
 INCOMMING_MESSAGE_TIMEOUT: float = 1.0
@@ -30,8 +30,8 @@ class Hanako(App):
         assert not self._subscriber, "Subscriber has been already bound."
         self._subscriber = subscriber
 
-    def build(self) -> widgets.RootWidget:
-        return widgets.RootWidget()
+    def build(self) -> uix.RootWidget:
+        return uix.RootWidget()
 
     async def async_run_with(self, *futures: asyncio.Future) -> None:
         await super().async_run("asyncio")

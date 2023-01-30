@@ -6,7 +6,7 @@ import js2py
 from kivy.network.urlrequest import UrlRequest
 from loguru import logger
 
-from hanako.models import HitomiGallery, HitomiFile
+from hanako.models import HitomiFile, HitomiGallery
 
 
 def log_on_success(*_) -> None:

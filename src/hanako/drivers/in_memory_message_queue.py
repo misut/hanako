@@ -1,7 +1,7 @@
 from queue import Empty, Queue
 
 from hanako.interfaces import Message, MessageReceiver, MessageSender
-from hanako.monads import Some, Null, Option
+from hanako.monads import Null, Option, Some
 
 
 class InMemoryMessageQueue(MessageReceiver, MessageSender):
