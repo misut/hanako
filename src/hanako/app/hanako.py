@@ -4,7 +4,7 @@ from kivy.app import App
 from loguru import logger
 
 from hanako.app import uix
-from hanako.command import CommandContext, command_handler, commands
+from hanako.command import CommandContext, command_handler, commands, command_context
 from hanako.interfaces import Message, MessageReceiver
 
 INCOMMING_MESSAGE_TIMEOUT: float = 1.0
@@ -17,13 +17,11 @@ async def process_message(message: Message, command_context: CommandContext) -> 
 
 
 class Hanako(App):
-    _command_context: CommandContext
     _subscriber: MessageReceiver | None
 
-    def __init__(self, command_context: CommandContext):
+    def __init__(self):
         super().__init__()
 
-        self._command_context = command_context
         self._subscriber = None
 
     def bind(self, subscriber: MessageReceiver) -> None:
@@ -50,7 +48,7 @@ class Hanako(App):
         if not incomming:
             return
 
-        await process_message(incomming.unwrap(), self._command_context)
+        await process_message(incomming.unwrap(), command_context())
         logger.debug("Processed.")
 
     async def process(self) -> None:

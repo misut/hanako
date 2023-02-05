@@ -1,11 +1,11 @@
 from collections.abc import Iterator, Mapping
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
 
 
-class FrozenDict(Mapping[K, V], Generic[K, V]):
+class FrozenDict(Mapping[K, V]):
     _map: dict[K, V]
 
     def __init__(self, *args, **kwargs) -> None:

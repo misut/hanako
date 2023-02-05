@@ -12,7 +12,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 
-from hanako.app.uix.behaviors import MessengerBehavior
+from hanako.app.uix.behaviors import CommandBehavior
 from hanako.app.uix.image_button import ImageButton
 from hanako.command import commands
 
@@ -23,7 +23,7 @@ def size_to_parent(
     ratio_height: float = 1.0,
     offset_width: float = 0.0,
     offset_height: float = 0.0,
-) -> Callable[[Window, ReferenceListProperty], None]:
+) -> Callable[[Widget, ReferenceListProperty], None]:
     def resize(*_) -> None:
         widget.width = widget.parent.width * ratio_width + offset_width
         widget.height = widget.parent.height * ratio_height + offset_height
@@ -60,7 +60,7 @@ class MainScreen(Screen):
 
 
 class HomeView(ScrollView):
-    _layout: GridLayout
+    _manga_list: GridLayout
 
     def __init__(self) -> None:
         super().__init__(
@@ -166,7 +166,7 @@ class SidebarView(ScrollView):
         print("pressed home")
 
 
-class ThumbnailDetailWidget(ButtonBehavior, MessengerBehavior, RelativeLayout):
+class ThumbnailDetailWidget(ButtonBehavior, CommandBehavior, RelativeLayout):
     def __init__(self, title: str, description: str) -> None:
         super().__init__(size_hint=(1.0, 1.0))
 

@@ -1,12 +1,6 @@
-from loguru import logger
-
 from hanako.command.context import CommandContext
 from hanako.command.handler import CommandHandler
 from hanako.models import Command, IDType
-
-
-def log_on_success(*_) -> None:
-    logger.info("Succeeded.")
 
 
 class FetchMangaIDs(Command):

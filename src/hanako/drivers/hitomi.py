@@ -4,22 +4,18 @@ from typing import Literal, cast
 
 import js2py
 from kivy.network.urlrequest import UrlRequest
-from loguru import logger
 
-from hanako.interfaces import Manga, MangaPage, MangaService
+from hanako.domain import HitomiGallery, HitomiPage
+from hanako.interfaces import HitomiService
 from hanako.models import IDType
 
 
-def log_on_success(*_) -> None:
-    logger.info("Succeeded.")
-
-
-async def generate_download_url(page: MangaPage) -> str:
+async def generate_download_url(page: HitomiPage) -> str:
     req = UrlRequest(url="https://ltn.hitomi.la/gg.js")
     await asyncio.to_thread(req.wait)
     gg = js2py.eval_js(req.result)
 
-    def determine_extension(page: MangaPage) -> Literal["avif", "webp"]:
+    def determine_extension(page: HitomiPage) -> Literal["avif", "webp"]:
         if page.hasavif:
             return "avif"
         if page.haswebp:
@@ -27,18 +23,18 @@ async def generate_download_url(page: MangaPage) -> str:
 
         raise ValueError(f"No supported extensions: {page.filename}")
 
-    def determine_filename(page: MangaPage) -> str:
+    def determine_filename(page: HitomiPage) -> str:
         if page.hash == "":
             return page.filename
 
         return page.hash
 
-    def determine_route(page: MangaPage, gg: js2py.base.JsObjectWrapper) -> str:
+    def determine_route(page: HitomiPage, gg: js2py.base.JsObjectWrapper) -> str:
         g = page.hash[-3:]
 
         return f"{gg.b}{gg.s(g)}"
 
-    def determine_subdomain(page: MangaPage, gg: js2py.base.JsObjectWrapper) -> str:
+    def determine_subdomain(page: HitomiPage, gg: js2py.base.JsObjectWrapper) -> str:
         g = page.hash[-3:]
 
         return chr(97 + gg.m(int(gg.s(g))))
@@ -51,45 +47,44 @@ async def generate_download_url(page: MangaPage) -> str:
     return f"https://{subdomain}a.hitomi.la/{extension}/{route}/{filename}.{extension}"
 
 
-class Hitomi(MangaService):
-    async def fetch_ids(self, offset: int, limit: int) -> list[IDType]:
-        byte_beg = offset * 4
-        byte_end = byte_beg + limit * 4 - 1
-        headers = {
-            "origin": "https://hitomi.la",
-            "Range": f"bytes={byte_beg}-{byte_end}",
-        }
-        url = "https://ltn.hitomi.la/index-all.nozomi"
+class Hitomi(HitomiService):
+    async def fetch_ids(self, offset: int = 0, limit: int = 0) -> list[IDType]:
+        headers = {"origin": "https://hitomi.la"}
+        if limit > 0:
+            byte_beg = offset * 4
+            byte_end = byte_beg + limit * 4 - 1
+            headers["Range"] = f"bytes={byte_beg}-{byte_end}"
 
+        url = "https://ltn.hitomi.la/index-all.nozomi"
         req = UrlRequest(
             url=url,
             decode=False,
             timeout=3,
             method="GET",
-            on_success=log_on_success,
             req_headers=headers,
         )
         await asyncio.to_thread(req.wait)
 
-        res = bytes(req.result, "utf-8")
+        res = req.result
+        if isinstance(res, str):
+            res = res.encode("utf-8")
         ttl_bytes = len(res) // 4
         return [cast(IDType, id) for id in unpack(f">{ttl_bytes}i", res)]
 
-    async def fetch_manga(self, manga_id: IDType) -> Manga:
-        url = f"https://ltn.hitomi.la/galleries/{manga_id}.js"
-        req = UrlRequest(url=url, on_success=log_on_success)
+    async def fetch_gallery(self, gallery_id: IDType) -> HitomiGallery:
+        url = f"https://ltn.hitomi.la/galleries/{gallery_id}.js"
+        req = UrlRequest(url=url)
         await asyncio.to_thread(req.wait)
-        return Manga(**js2py.eval_js(req.result).to_dict())
+        return HitomiGallery(**js2py.eval_js(req.result).to_dict())
 
-    async def download_page(self, manga_id: IDType, page: MangaPage) -> None:
+    async def download_page(self, gallery_id: IDType, page: HitomiPage) -> None:
         headers = {
-            "referer": f"https://hitomi.la/reader/{manga_id}.html",
+            "referer": f"https://hitomi.la/reader/{gallery_id}.html",
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         }
         url = await generate_download_url(page)
         req = UrlRequest(
             url=url,
-            on_success=log_on_success,
             req_headers=headers,
             timeout=3,
             file_path=f"wow/{page.filename}",
@@ -97,6 +92,6 @@ class Hitomi(MangaService):
         )
         await asyncio.to_thread(req.wait)
 
-    async def download_manga(self, manga: Manga) -> None:
-        for page in manga.pages:
-            await self.download_page(manga.id, page)
+    async def download_gallery(self, gallery: HitomiGallery) -> None:
+        for page in gallery.pages:
+            await self.download_page(gallery.id, page)

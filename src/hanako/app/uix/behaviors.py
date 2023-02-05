@@ -46,13 +46,13 @@ class HoverBehavior:
         ...
 
 
-class MessengerBehavior:
-    publisher = ObjectProperty(Publisher())
+class CommandBehavior:
+    _publisher: MessageSender = ObjectProperty(Publisher())
 
     def __init__(self, **kwargs) -> None:
         assert isinstance(
             self, Widget
-        ), "'MessengerBehavior' should be mixin with 'Widget'"
+        ), "'CommandBehavior' should be mixin with 'Widget'"
         assert "publisher" not in kwargs or isinstance(
             kwargs["publisher"], MessageSender
         ), "'publisher' should be an instance of 'MessageSender'"
@@ -61,4 +61,4 @@ class MessengerBehavior:
         self.register_event_type("on_command")
 
     def on_command(self, command: Command) -> None:
-        self.publisher.send(Message.from_command(command=command))
+        self._publisher.send(Message.from_command(command=command))

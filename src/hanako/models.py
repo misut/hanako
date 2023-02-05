@@ -1,12 +1,20 @@
+import uuid
 from datetime import datetime
+from typing import cast
 
 import pydantic
+
+IDType = str
+
+
+def generate_id() -> IDType:
+    return cast(IDType, uuid.uuid4())
+
 
 now = datetime.now
 
 DefaultDatetimeField = pydantic.Field(default_factory=now)
-
-IDType = str
+DefaultIDField = pydantic.Field(default_factory=generate_id)
 
 
 def milliseconds_encoding(dt: datetime) -> str:
@@ -16,6 +24,15 @@ def milliseconds_encoding(dt: datetime) -> str:
 class BaseModel(pydantic.BaseModel):
     class Config:
         json_encoders = {datetime: milliseconds_encoding}
+
+
+class Entity(BaseModel):
+    class Config:
+        underscore_attrs_are_private = True
+
+
+class AggregateRoot(Entity):
+    ...
 
 
 class ImmutableModel(BaseModel):
@@ -31,23 +48,18 @@ class Command(ImmutableModel):
     triggered_by: str = ""
 
 
-class Context(ImmutableModel):
+class Query(ImmutableModel):
+    ...
+
+
+class DomainEvent(ImmutableModel):
+    __entity_type__: str
+
+    entity_id: IDType
+    entity_version: int
+    occurred_at: datetime = DefaultDatetimeField
+
+
+class View(ImmutableModel):
     class Config:
-        frozen = True
-
-
-class HitomiFile(ValueObject):
-    name: str
-    width: int
-    height: int
-    hash: str
-
-    hasavif: bool | None
-    haswebp: bool | None
-
-
-class HitomiGallery(ValueObject):
-    id: str
-    title: str
-    language: str
-    files: list[HitomiFile]
+        orm_mode = True

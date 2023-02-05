@@ -1,12 +1,12 @@
-from hanako.interfaces.manga import Manga, MangaPage, MangaService, MangaTag
+from hanako.interfaces.database import Repository, Storage
+from hanako.interfaces.hitomi import HitomiService
 from hanako.interfaces.message import Message, MessageReceiver, MessageSender
 
 __all__ = (
-    "Manga",
-    "MangaPage",
-    "MangaService",
-    "MangaTag",
+    "HitomiService",
     "Message",
     "MessageReceiver",
     "MessageSender",
+    "Repository",
+    "Storage",
 )
