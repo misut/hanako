@@ -12,6 +12,25 @@ readme = "README.md"
 repository = "https://github.com/misut/hanako.git"
 
 
+[tool.coverage.run]
+branch = true
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod"
+]
+fail_under = 90
+show_missing = true
+skip_covered = true
+skip_empty = true
+
+
+[tool.isort]
+profile = "black"
+
+
 [tool.mypy]
 plugins = "pydantic.mypy, sqlalchemy.ext.mypy.plugin"
 pretty = true
@@ -33,6 +52,7 @@ pylint = "^2.15.9"
 mypy = "^0.991"
 pytest = "^7.2.0"
 pytest-asyncio = "^0.20.3"
+pytest-cov = "^4.0.0"
 
 
 [tool.poetry.scripts]
@@ -44,8 +64,8 @@ _black = "black ."
 _isort = "isort ."
 format = ["_black", "_isort"]
 
-_pytest = "pytest -vvsx tests"
-unittest = ["_pytest"]
+unittest = "pytest -vvsx tests"
+coverage = "pytest --cov=src/hanako tests"
 
 
 [build-system]
