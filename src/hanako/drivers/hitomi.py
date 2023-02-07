@@ -6,7 +6,7 @@ import js2py
 from kivy.network.urlrequest import UrlRequest
 
 from hanako.domain import HitomiGallery, HitomiPage
-from hanako.interfaces import HitomiService
+from hanako.interfaces import MangaService
 from hanako.models import IDType
 
 
@@ -47,7 +47,7 @@ async def generate_download_url(page: HitomiPage) -> str:
     return f"https://{subdomain}a.hitomi.la/{extension}/{route}/{filename}.{extension}"
 
 
-class Hitomi(HitomiService):
+class Hitomi(MangaService):
     async def fetch_ids(self, offset: int = 0, limit: int = 0) -> list[IDType]:
         headers = {"origin": "https://hitomi.la"}
         if limit > 0:

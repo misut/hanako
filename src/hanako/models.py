@@ -56,7 +56,6 @@ class DomainEvent(ImmutableModel):
     __entity_type__: str
 
     entity_id: IDType
-    entity_version: int
     occurred_at: datetime = DefaultDatetimeField
 
 

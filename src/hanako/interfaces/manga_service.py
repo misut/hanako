@@ -4,7 +4,7 @@ from hanako.domain import HitomiGallery, HitomiPage
 from hanako.models import IDType
 
 
-class HitomiService(abc.ABC):
+class MangaService(abc.ABC):
     @abc.abstractmethod
     async def fetch_ids(self, offset: int, limit: int) -> list[IDType]:
         ...

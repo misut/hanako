@@ -4,7 +4,6 @@ from sqlalchemy import orm as sqlalchemyorm
 
 from hanako.command import MangaStorage
 from hanako.domain import Manga
-from hanako.drivers.orm import MangaOrm
 
 
 class SqlMangaStorage(MangaStorage):

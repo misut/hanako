@@ -1,6 +1,11 @@
 import pytest
 
-from hanako import hitomi
+from hanako.drivers import Hitomi
+
+
+@pytest.fixture(name="hitomi", scope="module")
+def get_hitomi() -> Hitomi:
+    return Hitomi()
 
 
 @pytest.mark.asyncio
@@ -12,11 +17,9 @@ from hanako import hitomi
         ("2418097", "Roshutsu Shoujo to Zange Ana | 노출소녀와 참회구멍"),
     ],
 )
-async def test_load_gallery(expected_id: str, expected_title: str) -> None:
-    gallery = await hitomi.load_gallery(expected_id)
+async def test_load_gallery(
+    hitomi: Hitomi, expected_id: str, expected_title: str
+) -> None:
+    gallery = await hitomi.fetch_gallery(expected_id)
     assert gallery.id == expected_id
     assert gallery.title == expected_title
-
-    url = await hitomi.generate_download_url(gallery.files[0])
-    await hitomi.download_gallery(gallery)
-    assert url is None

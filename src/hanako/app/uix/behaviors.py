@@ -4,7 +4,8 @@ from kivy.uix.widget import Widget
 
 from hanako.drivers import Publisher
 from hanako.interfaces import Message, MessageSender
-from hanako.models import Command
+from hanako.models import Command, Query
+from hanako.query import QueryResult, query_context, query_handler
 
 
 class HoverBehavior:
@@ -62,3 +63,19 @@ class CommandBehavior:
 
     def on_command(self, command: Command) -> None:
         self._publisher.send(Message.from_command(command=command))
+
+
+class QueryBehavior:
+    def __init__(self, **kwargs) -> None:
+        assert isinstance(self, Widget), "'QueryBehavior' should be mixin with 'Widget'"
+        super().__init__(**kwargs)
+
+        self.register_event_type("on_request")
+        self.register_event_type("on_response")
+
+    def on_request(self, query: Query) -> None:
+        result = query_handler.handle(query, query_context())
+        self.dispatch("on_response", query, result)  # type: ignore
+
+    def on_response(self, request: Query, reponse: QueryResult) -> None:
+        ...

@@ -1,13 +1,47 @@
 import asyncio
+import pathlib
 
-from kivy.app import App
+from kivy.app import App, Builder
+from kivy.factory import Factory
 from loguru import logger
 
-from hanako.app import uix
-from hanako.command import CommandContext, command_handler, commands, command_context
+from hanako.app import root_widget
+from hanako.command import CommandContext, command_context, command_handler, commands
 from hanako.interfaces import Message, MessageReceiver
 
+DEFAULT_KV_ROOT: str = "src/hanako/app"
 INCOMMING_MESSAGE_TIMEOUT: float = 1.0
+
+
+def build_kv_files(root: str | pathlib.Path) -> None:
+    kv_root = pathlib.Path(root)
+    kv_files: list[str] = []
+    for kv_file in kv_root.iterdir():
+        if kv_file.is_dir():
+            build_kv_files(kv_file)
+        if kv_file.suffix != ".kv":
+            continue
+        if kv_file.absolute() == pathlib.Path(__file__).with_suffix(".kv"):
+            continue
+        kv_files.append(str(kv_file))
+        logger.debug(f"Loading {kv_file.absolute()}")
+
+    for f in kv_files:
+        Builder.load_file(f)
+        logger.debug(f"Loaded {f}")
+
+
+def register_factories() -> None:
+    register = Factory.register
+    register("RootWidget", module="hanako.app.root_widget")
+
+    register("CommandBehavior", module="hanako.app.uix.behaviors")
+    register("HoverBehavior", module="hanako.app.uix.behaviors")
+    register("QueryBehavior", module="hanako.app.uix.behaviors")
+    register("ImageButton", module="hanako.app.uix.image_button")
+    register("MangaDetail", module="hanako.app.uix.manga_detail")
+
+    register("MainScreen", module="hanako.app.screens.main")
 
 
 async def process_message(message: Message, command_context: CommandContext) -> None:
@@ -28,8 +62,10 @@ class Hanako(App):
         assert not self._subscriber, "Subscriber has been already bound."
         self._subscriber = subscriber
 
-    def build(self) -> uix.RootWidget:
-        return uix.RootWidget()
+    def build(self) -> root_widget.RootWidget:
+        build_kv_files(DEFAULT_KV_ROOT)
+        register_factories()
+        return root_widget.RootWidget()
 
     async def async_run_with(self, *futures: asyncio.Future) -> None:
         await super().async_run("asyncio")

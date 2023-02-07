@@ -1,0 +1,29 @@
+<MangaDetail>:
+    RelativeLayout:
+        pos: root.pos
+        size_hint: None, None
+        size: root.size
+
+        Image:
+            allow_stretch: True
+            keep_ratio: False
+            mipmap: True
+            pos: 0, 0
+            size_hint: None, None
+            size: root.size
+            source: root.thumbnail
+
+        Label:
+            color: 0.0, 0.0, 0.0, 1.0
+            font_size: sp(14)
+            pos: root.width / 2.0 - self.texture_size[0] / 2.0, dp(10)
+            size_hint: None, None
+            size: self.texture_size
+            text: root.title
+
+            canvas.before:
+                Color:
+                    rgba: root.color
+                Rectangle:
+                    pos: 0, 0
+                    size: root.width, dp(40)

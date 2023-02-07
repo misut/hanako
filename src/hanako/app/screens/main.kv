@@ -1,0 +1,108 @@
+<MangaListView>:
+    do_scroll_x: False
+    do_scroll_y: True
+    viewclass: "MangaDetail"
+
+    canvas.before:
+        Color:
+            rgba: 0.0, 1.0, 0.0, 1.0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    GridLayout:
+        cols: 3
+        row_default_height: dp(160)
+        row_force_default: True
+        padding: dp(40), dp(10), 0, 0
+        size_hint: 1.0, None
+        spacing: dp(20), dp(10)
+
+        MangaDetail:
+            title: "Hello, world!"
+
+
+<AppbarView>:
+    do_scroll_x: True
+    do_scroll_y: False
+
+    canvas.before:
+        Color:
+            rgba: 0.0, 0.0, 1.0, 1.0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    RelativeLayout:
+        pos_hint_x: 0.0
+        pos_hint_y: 0.0
+        size: root.size
+
+
+<SidebarView>:
+    do_scroll_x: False
+    do_scroll_y: True
+
+    canvas.before:
+        Color:
+            rgba: 1.0, 0.0, 0.0, 1.0
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    RelativeLayout:
+        pos_hint_x: 0.0
+        pos_hint_y: 0.0
+        size: root.size
+
+        ImageButton:
+            source_normal: "resources/drawables/icon_home.png"
+            allow_stretch: True
+            color_normal: 0.0, 0.0, 0.0, 1.0
+            color_hover: 0.0, 1.0, 1.0, 1.0
+            mipmap: True
+            pos: dp(18), root.height - dp(42)
+            size_hint: None, None
+            size: dp(24), dp(24)
+
+        ImageButton:
+            source_normal: "resources/drawables/icon_home.png"
+            allow_stretch: True
+            color_normal: 0.0, 0.0, 0.0, 1.0
+            color_hover: 0.0, 1.0, 1.0, 1.0
+            mipmap: True
+            pos: dp(18), root.height - dp(84)
+            size_hint: None, None
+            size: dp(24), dp(24)
+
+        ImageButton:
+            source_normal: "resources/drawables/icon_home.png"
+            allow_stretch: True
+            color_normal: 0.0, 0.0, 0.0, 1.0
+            color_hover: 0.0, 1.0, 1.0, 1.0
+            mipmap: True
+            pos: dp(18), root.height - dp(126)
+            size_hint: None, None
+            size: dp(24), dp(24)
+
+
+<MainScreen>:
+    RelativeLayout:
+        pos_hint_x: 0.0
+        pos_hint_y: 0.0
+        size_hint: 1.0, 1.0
+
+        MangaListView:
+            pos: 0.0, 0.0
+            size_hint: None, None
+            size: root.width - dp(60), root.height - dp(120)
+
+        AppbarView:
+            pos: 0.0, root.height - dp(120)
+            size_hint: None, None
+            size: root.width - dp(60), dp(120)
+
+        SidebarView:
+            pos: root.width - dp(60), 0.0
+            size_hint: None, None
+            size: dp(60), self.parent.height
