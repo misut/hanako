@@ -2,7 +2,7 @@ import pathlib
 from datetime import datetime
 from typing import Any
 
-from hanako.models import AggregateRoot, DefaultDatetimeField, DomainEvent, IDType, now
+from kyrie.models import AggregateRoot, DefaultDatetimeField, DomainEvent, IDType, now
 
 
 class _MangaEvent(DomainEvent):

@@ -4,7 +4,6 @@ from hanako.query.context import (
     initialize_query_context,
     query_context,
 )
-from hanako.query.handler import QueryResult
 from hanako.query.queries import query_handler
 from hanako.query.views import MangaView
 
@@ -12,7 +11,6 @@ __all__ = (
     "MangaRepository",
     "MangaView",
     "QueryContext",
-    "QueryResult",
     "initialize_query_context",
     "query_context",
     "query_handler",

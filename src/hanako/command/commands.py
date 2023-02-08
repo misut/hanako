@@ -1,6 +1,7 @@
-from hanako.command.context import CommandContext
-from hanako.command.handler import CommandHandler
-from hanako.models import Command, IDType
+from kyrie.command import CommandHandler
+from kyrie.models import Command, IDType
+
+from hanako.command.context import HanakoCommandContext
 
 
 class FetchMangaIDs(Command):
@@ -10,7 +11,7 @@ class FetchMangaIDs(Command):
 
 async def fetch_manga_ids(
     command: FetchMangaIDs,
-    context: CommandContext,
+    context: HanakoCommandContext,
 ) -> list[IDType]:
     hitomi = context.hitomi()
     manga_ids = await hitomi.fetch_ids(command.offset, command.limit)

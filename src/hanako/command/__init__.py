@@ -5,9 +5,11 @@ from hanako.command.context import (
     command_context,
     initialize_command_context,
 )
+from hanako.command.manga_service import MangaService
 
 __all__ = (
     "CommandContext",
+    "MangaService",
     "MangaStorage",
     "command_context",
     "command_handler",

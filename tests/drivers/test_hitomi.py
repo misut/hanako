@@ -1,6 +1,6 @@
 import pytest
 
-from hanako.drivers import Hitomi
+from hanako.infrastructure import Hitomi
 
 
 @pytest.fixture(name="hitomi", scope="module")

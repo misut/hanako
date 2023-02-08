@@ -1,4 +1,4 @@
-from hanako.models import IDType, View
+from kyrie.models import IDType, View
 
 
 class MangaPageView(View):

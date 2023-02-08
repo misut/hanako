@@ -1,26 +1,28 @@
 from contextvars import ContextVar
 from dataclasses import dataclass
 
-from hanako.context import Context, Provider
-from hanako.interfaces import Repository
+from kyrie.context import Provider
+from kyrie.interfaces import Repository
+from kyrie.query import QueryContext
+
 from hanako.query.views import MangaView
 
 MangaRepository = Repository[MangaView]
 
 
 @dataclass(frozen=True)
-class QueryContext(Context):
+class HanakoQueryContext(QueryContext):
     manga_repository: Provider[MangaRepository]
 
 
-_query_context: ContextVar[QueryContext] = ContextVar("query_context")
+_query_context: ContextVar[HanakoQueryContext] = ContextVar("query_context")
 
 
 def initialize_query_context(
     manga_repository_provider: Provider[MangaRepository],
 ) -> None:
-    _query_context.set(QueryContext(manga_repository=manga_repository_provider))
+    _query_context.set(HanakoQueryContext(manga_repository=manga_repository_provider))
 
 
-def query_context() -> QueryContext:
+def query_context() -> HanakoQueryContext:
     return _query_context.get()

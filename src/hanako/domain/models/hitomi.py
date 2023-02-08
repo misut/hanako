@@ -1,6 +1,6 @@
 import pydantic
 
-from hanako.models import IDType, ImmutableModel, ValueObject
+from kyrie.models import IDType, ImmutableModel, ValueObject
 
 
 class HitomiArtist(ValueObject):

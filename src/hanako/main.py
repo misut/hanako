@@ -1,37 +1,35 @@
-import asyncio
-
-from hanako import app
-from hanako.command import initialize_command_context
-from hanako.context import Provider
-from hanako.drivers import (
-    Hitomi,
-    SqlDatabase,
-    SqlMangaRepository,
-    SqlMangaStorage,
-    Subscriber,
-)
-from hanako.query import initialize_query_context
-
-DEFAULT_SQLITE_URL = "sqlite:///hanako.db?check_same_thread=False"
+import flet as ft
 
 
-def build_hanako() -> app.Hanako:
-    database = SqlDatabase(url=DEFAULT_SQLITE_URL)
-    database.create_all()
+def main(page: ft.Page) -> None:
+    page.title = "Flet counter example"
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
-    initialize_command_context(
-        Provider(Hitomi), Provider(SqlMangaStorage, session_factory=database.session)
+    txt_number = ft.TextField(value="0", text_align=ft.TextAlign.RIGHT, width=100)
+
+    def minus_click(e):
+        txt_number.value = str(int(txt_number.value) - 1)
+        page.update()
+
+    def plus_click(e):
+        txt_number.value = str(int(txt_number.value) + 1)
+        page.update()
+
+    page.add(
+        ft.Row(
+            [
+                ft.IconButton(ft.icons.REMOVE, on_click=minus_click),
+                txt_number,
+                ft.IconButton(ft.icons.ADD, on_click=plus_click),
+            ],
+            alignment=ft.MainAxisAlignment.CENTER,
+        )
     )
-    initialize_query_context(
-        Provider(SqlMangaRepository, session_factory=database.session)
-    )
-
-    hanako = app.Hanako()
-    subscriber = Subscriber()
-    hanako.bind(subscriber)
-    return hanako
 
 
 def run(debug: bool = True) -> None:
-    hanako = build_hanako()
-    asyncio.run(hanako.async_run(), debug=debug)
+    ft.app(target=main)
+
+
+if __name__ == "__main__":
+    run(debug=False)
