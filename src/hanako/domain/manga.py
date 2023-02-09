@@ -19,9 +19,7 @@ class MangaFlushed(_MangaEvent):
 
 
 class MangaFetched(_MangaEvent):
-    title: str
-    fetched_at: datetime
-    updated_at: datetime
+    entity: "Manga"
 
 
 class MangaUpdated(_MangaEvent):
@@ -38,14 +36,9 @@ class Manga(AggregateRoot):
     updated_at: datetime = DefaultDatetimeField
 
     @classmethod
-    def create(cls, **data: Any) -> MangaFetched:
-        obj = cls(**data)
-        return MangaFetched(
-            entity_id=obj.id,
-            title=obj.title,
-            fetched_at=obj.fetched_at,
-            updated_at=obj.updated_at,
-        )
+    def create(cls, id: IDType, title: str) -> MangaFetched:
+        obj = cls(id=id, title=title)
+        return MangaFetched(entity_id=obj.id, entity=obj)
 
     def is_cached(self) -> bool:
         if self.cached_in is not None:

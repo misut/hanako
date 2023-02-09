@@ -8,19 +8,19 @@ T = TypeVar("T")
 
 class Repository(abc.ABC, Generic[T]):
     @abc.abstractmethod
-    def find(self, offset: int, limit: int, **filters: object) -> tuple[T, ...]:
+    async def find(self, offset: int, limit: int, **filters: object) -> tuple[T, ...]:
         ...
 
     @abc.abstractmethod
-    def find_one(self, **filters: object) -> Option[T]:
+    async def find_one(self, **filters: object) -> Option[T]:
         ...
 
 
 class Storage(abc.ABC, Generic[T]):
     @abc.abstractmethod
-    def save(self, *entities: T) -> None:
+    async def save(self, *entities: T) -> None:
         ...
 
     @abc.abstractmethod
-    def save_one(self, entity: T) -> None:
+    async def save_one(self, entity: T) -> None:
         ...

@@ -10,12 +10,12 @@ class InMemoryMessageQueue(Receiver, Sender):
     def __init__(self, limit: int = 0) -> None:
         self._queue = Queue(limit)
 
-    def send(self, message: Message) -> None:
-        self._queue.put(message)
+    async def send(self, message: Message) -> None:
+        self._queue.put_nowait(message)
 
-    def receive(self, timeout: float | None = None) -> Option[Message]:
+    async def receive(self, timeout: float | None = None) -> Option[Message]:
         try:
-            message = self._queue.get(block=False, timeout=timeout)
+            message = self._queue.get_nowait()
             return Some(message)
         except Empty:
             return Null

@@ -1,11 +1,23 @@
-from hanako.infrastructure.hitomi import Hitomi
-from hanako.infrastructure.sql_database import SqlDatabase
-from hanako.infrastructure.sql_manga_repository import SqlMangaRepository
-from hanako.infrastructure.sql_manga_storage import SqlMangaStorage
+from hanako.infrastructure.gg import GG, GGjs
+from hanako.infrastructure.http_client import HttpClient
+from hanako.infrastructure.http_hitomi_service import HttpHitomiService
+from hanako.infrastructure.sqlite_database import SqliteDatabase
+from hanako.infrastructure.sqlite_repository import (
+    SqliteMangaRepository,
+    SqlitePoolRepository,
+)
+from hanako.infrastructure.sqlite_storage import SqliteMangaStorage, SqlitePoolStorage
 
 __all__ = (
-    "Hitomi",
-    "SqlDatabase",
+    "GG",
+    "GGjs",
+    "HttpClient",
+    "HttpHitomiService",
+    "SqliteDatabase",
+    "SqliteMangaRepository",
+    "SqliteMangaStorage",
+    "SqlitePoolRepository",
+    "SqlitePoolStorage",
     "SqlMangaRepository",
     "SqlMangaStorage",
 )

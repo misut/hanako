@@ -27,11 +27,11 @@ class Message(ImmutableModel):
 
 class Sender(abc.ABC):
     @abc.abstractmethod
-    def send(self, message: Message) -> None:
+    async def send(self, message: Message) -> None:
         ...
 
 
 class Receiver(abc.ABC):
     @abc.abstractmethod
-    def receive(self, timeout: float | None = None) -> Option[Message]:
+    async def receive(self, timeout: float | None = None) -> Option[Message]:
         ...

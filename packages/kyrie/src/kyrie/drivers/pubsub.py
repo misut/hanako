@@ -19,11 +19,11 @@ class Publisher(Sender):
     _engine: Sender
     _triggered_by: str
 
-    def __init__(self, triggered_by: str = "") -> None:
-        self._engine = _Singleton.get_instance()
+    def __init__(self, engine: Sender | None = None, triggered_by: str = "") -> None:
+        self._engine = engine or _Singleton.get_instance()
         self._triggered_by = triggered_by
 
-    def send(self, message: Message) -> None:
+    async def send(self, message: Message) -> None:
         stamped = message
         if not stamped.triggered_by:
             stamped = Message(
@@ -32,14 +32,14 @@ class Publisher(Sender):
                 occured_at=message.occured_at,
                 triggered_by=self._triggered_by,
             )
-        self._engine.send(stamped)
+        await self._engine.send(stamped)
 
 
 class Subscriber(Receiver):
     _engine: Receiver
 
-    def __init__(self) -> None:
-        self._engine = _Singleton.get_instance()
+    def __init__(self, engine: Receiver | None = None) -> None:
+        self._engine = engine or _Singleton.get_instance()
 
-    def receive(self, timeout: float | None = None) -> Option[Message]:
-        return self._engine.receive(timeout)
+    async def receive(self, timeout: float | None = None) -> Option[Message]:
+        return await self._engine.receive(timeout)
