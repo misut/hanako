@@ -38,7 +38,7 @@ class Manga(AggregateRoot):
     @classmethod
     def create(cls, id: IDType, title: str) -> MangaFetched:
         obj = cls(id=id, title=title)
-        return MangaFetched(entity_id=obj.id, entity=obj)
+        return MangaFetched(entity=obj)
 
     def is_cached(self) -> bool:
         if self.cached_in is not None:
@@ -48,16 +48,12 @@ class Manga(AggregateRoot):
     def flush_cache(self) -> MangaFlushed:
         self.cached_in = None
         self.updated_at = now()
-        return MangaFlushed(
-            entity_id=self.id,
-            updated_at=self.updated_at,
-        )
+        return MangaFlushed(updated_at=self.updated_at)
 
     def sync_cache(self, cached_in: pathlib.Path) -> MangaCached:
         self.cached_in = cached_in
         self.updated_at = now()
         return MangaCached(
-            entity_id=self.id,
             cached_in=self.cached_in,
             updated_at=self.updated_at,
         )
@@ -66,7 +62,6 @@ class Manga(AggregateRoot):
         self.title = title
         self.updated_at = now()
         return MangaUpdated(
-            entity_id=self.id,
             title=self.title,
             updated_at=self.updated_at,
         )

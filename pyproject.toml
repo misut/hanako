@@ -11,7 +11,6 @@ packages = [
 readme = "README.md"
 repository = "https://github.com/misut/hanako.git"
 
-
 [tool.coverage.run]
 branch = true
 [tool.coverage.report]
@@ -26,18 +25,16 @@ show_missing = true
 skip_covered = true
 skip_empty = true
 
-
 [tool.isort]
 profile = "black"
-
 
 [tool.mypy]
 plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
 pretty = true
 
-
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.11,<3.12"
+aiofiles = "^23.1.0"
 aiosqlite = "^0.18.0"
 flet = "^0.4.0"
 httpx = "^0.23.3"
@@ -47,7 +44,6 @@ loguru = "^0.6.0"
 pydantic = "^1.10.4"
 sqlalchemy = {extras = ["asyncio", "mypy"], version = "^2.0.2"}
 
-
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 isort = "^5.11.4"
@@ -56,11 +52,10 @@ pytest = "^7.2.1"
 pytest-asyncio = "^0.20.3"
 pytest-cov = "^4.0.0"
 mypy = "^1.0.0"
-
+types-aiofiles = "^22.1.0.7"
 
 [tool.poetry.scripts]
 hanako = "hanako.main:run"
-
 
 [tool.poe.tasks]
 _black = "black ."
@@ -69,7 +64,6 @@ format = ["_black", "_isort"]
 
 unittest = "pytest -vvsx tests"
 coverage = "pytest --cov=src/hanako tests"
-
 
 [build-system]
 requires = ["poetry-core"]

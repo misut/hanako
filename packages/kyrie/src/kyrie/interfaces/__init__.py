@@ -4,7 +4,7 @@ from kyrie.interfaces.message import Message, Receiver, Sender
 
 __all__ = (
     "Exporter",
-    "Messsage",
+    "Message",
     "Receiver",
     "Repository",
     "Sender",

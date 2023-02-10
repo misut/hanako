@@ -1,8 +1,6 @@
 import abc
 from typing import Generic, TypeVar
 
-from kyrie.monads import Option
-
 T = TypeVar("T")
 
 
@@ -12,7 +10,7 @@ class Repository(abc.ABC, Generic[T]):
         ...
 
     @abc.abstractmethod
-    async def find_one(self, **filters: object) -> Option[T]:
+    async def find_one(self, **filters: object) -> T | None:
         ...
 
 

@@ -52,7 +52,7 @@ class HttpHitomiService(HitomiService):
 
     async def fetch_gallery_ids(
         self, language: str, offset: int, limit: int
-    ) -> list[IDType]:
+    ) -> list[IDType]:  # pragma: no cover
         url = f"https://ltn.hitomi.la/index-{language}.nozomi"
         headers = {"origin": "https://hitomi.la"}
         if limit > 0:
@@ -75,7 +75,9 @@ class HttpHitomiService(HitomiService):
 
         return HitomiGallery(**js2py.eval_js(response.text).to_dict())
 
-    async def download_page(self, gallery_id: IDType, page: HitomiPage) -> bytes:
+    async def download_page(
+        self, gallery_id: IDType, page: HitomiPage
+    ) -> bytes:  # pragma: no cover
         url = generate_download_url(page, self._gg)
         headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -88,7 +90,9 @@ class HttpHitomiService(HitomiService):
 
         return response.content
 
-    async def download_gallery(self, gallery: HitomiGallery) -> list[bytes]:
+    async def download_gallery(
+        self, gallery: HitomiGallery
+    ) -> list[bytes]:  # pragma: no cover
         tasks = [
             asyncio.create_task(self.download_page(gallery.id, page))
             for page in gallery.pages

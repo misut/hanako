@@ -9,7 +9,7 @@ from hanako.infrastructure import (
 
 
 @pytest.mark.asyncio
-async def test_sqlite_manga_storage(db: SqliteDatabase) -> None:
+async def test_manga(db: SqliteDatabase) -> None:
     repo = SqliteMangaRepository(db.session)
     store = SqliteMangaStorage(db.session)
 
@@ -18,7 +18,8 @@ async def test_sqlite_manga_storage(db: SqliteDatabase) -> None:
         Manga(id="test_2", title="test manga #2"),
     ]
     await store.save_one(expected[0])
-    result = (await repo.find_one(id=expected[0].id)).unwrap()
+    result = await repo.find_one(id=expected[0].id)
+    assert result
     assert expected[0].id == result.id
     assert expected[0].title == result.title
 

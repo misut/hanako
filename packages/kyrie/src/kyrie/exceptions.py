@@ -1,5 +1,5 @@
-__all__ = ("OperatorNotFoundError",)
+__all__ = ("ProcessorNotFoundError",)
 
 
-class OperatorNotFoundError(Exception):
+class ProcessorNotFoundError(Exception):
     ...

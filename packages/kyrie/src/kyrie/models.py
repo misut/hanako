@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import cast
+from typing import ClassVar, cast
 
 import pydantic
 
@@ -70,9 +70,8 @@ class Query(ImmutableModel):
 
 
 class DomainEvent(ImmutableModel):
-    __entity_type__: str
+    __entity_type__: ClassVar[str]
 
-    entity_id: IDType
     occurred_at: datetime = DefaultDatetimeField
 
 

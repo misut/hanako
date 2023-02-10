@@ -8,7 +8,7 @@ from hanako.domain import HitomiGallery, HitomiPage
 class HitomiService(abc.ABC):
     @abc.abstractmethod
     async def fetch_gallery_ids(
-        self, languae: str, offset: int, limit: int
+        self, language: str, offset: int, limit: int
     ) -> list[IDType]:
         ...
 
