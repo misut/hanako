@@ -5,7 +5,8 @@ from hanako.command import HanakoCommandContext, command_handler, event_handler
 from hanako.infrastructure import (
     GGjs,
     HttpClient,
-    HttpHitomiService,
+    HttpHitomiDownloader,
+    HttpHitomiFetcher,
     SqliteDatabase,
     SqliteMangaRepository,
     SqliteMangaStorage,
@@ -14,16 +15,20 @@ from hanako.infrastructure import (
 from hanako.query import HanakoQueryContext, query_handler
 
 
-def initialize_dependencies() -> None:
+async def initialize_dependencies() -> None:
     http_client = HttpClient()
-    gg = GGjs()
+    gg = await GGjs.create()
     sqlite_database = SqliteDatabase(
-        "sqlite+aiosqlite:///:memory:?check_same_thread=False"
+        "sqlite+aiosqlite:///hanako.db?check_same_thread=False"
     )
+    await sqlite_database.create_all()
 
     command_context = HanakoCommandContext(
-        hitomi_service=Provider(
-            HttpHitomiService, client_factory=http_client.client, gg=gg
+        hitomi_downloader=Provider(
+            HttpHitomiDownloader, client_factory=http_client.client
+        ),
+        hitomi_fetcher=Provider(
+            HttpHitomiFetcher, client_factory=http_client.client, gg=gg
         ),
         manga_storage=Provider(
             SqliteMangaStorage, session_factory=sqlite_database.session

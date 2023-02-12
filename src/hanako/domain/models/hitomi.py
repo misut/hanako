@@ -1,3 +1,4 @@
+from typing import Any
 import pydantic
 from kyrie.models import IDType, ImmutableModel, ValueObject
 
@@ -37,8 +38,12 @@ class HitomiGallery(ImmutableModel):
     type: str
     language: str
     galleryurl: str
-    artists: list[HitomiArtist]
     pages: list[HitomiPage] = pydantic.Field(alias="files")
 
+    artists: list[HitomiArtist] = []
     related: list[IDType] = []
     tags: list[HitomiTag] = []
+
+    @pydantic.validator("artists", "related", "tags", pre=True)
+    def parse_none(cls, value: None | Any) -> list | Any:
+        return value or []

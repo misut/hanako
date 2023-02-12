@@ -31,7 +31,11 @@ class Pool(AggregateRoot):
 
     @classmethod
     def create(
-        cls, manga_ids: list[IDType], language: str, offset: int, limit: int
+        cls,
+        manga_ids: list[str],
+        language: str,
+        offset: int,
+        limit: int,
     ) -> PoolFetched:
         if language not in MangaLanguage:
             raise ValueError(f"Language '{language}' Not Supported")

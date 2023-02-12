@@ -1,10 +1,10 @@
 from kyrie.frameworks.command import (
+    Always,
     Command,
     CommandBus,
     CommandContext,
     CommandHandler,
     EventHandler,
-    NotOccured,
 )
 from kyrie.frameworks.dependencies import (
     command_bus,
@@ -15,12 +15,12 @@ from kyrie.frameworks.dependencies import (
 from kyrie.frameworks.query import Query, QueryBus, QueryContext, QueryHandler
 
 __all__ = (
+    "Always",
     "Command",
     "CommandBus",
     "CommandContext",
     "CommandHandler",
     "EventHandler",
-    "NotOccured",
     "Query",
     "QueryBus",
     "QueryContext",

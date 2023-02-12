@@ -1,67 +1,53 @@
-import pathlib
+from collections.abc import Mapping, Sequence
 from datetime import datetime
-from typing import Any
 
-from kyrie.models import AggregateRoot, DefaultDatetimeField, DomainEvent, IDType, now
+from kyrie.models import (
+    AggregateRoot,
+    DefaultDatetimeField,
+    DomainEvent,
+    Entity,
+    IDType,
+)
+
+
+class MangaPage(Entity):
+    filename: str
+    hash: str
+    url: str
+
+    cached_in: str | None = None
 
 
 class _MangaEvent(DomainEvent):
     __entity_type__ = "Manga"
 
 
-class MangaCached(_MangaEvent):
-    cached_in: pathlib.Path
-    updated_at: datetime
-
-
-class MangaFlushed(_MangaEvent):
-    updated_at: datetime
-
-
 class MangaFetched(_MangaEvent):
     entity: "Manga"
-
-
-class MangaUpdated(_MangaEvent):
-    title: str
-    updated_at: datetime
 
 
 class Manga(AggregateRoot):
     id: IDType
     title: str
+    thumbnail: str
+    pages: list[MangaPage]
 
-    cached_in: pathlib.Path | None = None
     fetched_at: datetime = DefaultDatetimeField
     updated_at: datetime = DefaultDatetimeField
 
     @classmethod
-    def create(cls, id: IDType, title: str) -> MangaFetched:
-        obj = cls(id=id, title=title)
+    def create(
+        cls,
+        id: IDType,
+        title: str,
+        thumbnail: str,  # base64 encoded
+        pages: Sequence[Mapping[str, int | str]],
+    ) -> MangaFetched:
+        obj = cls(
+            id=id,
+            title=title,
+            thumbnail=thumbnail,
+            pages=pages,
+        )
+        MangaFetched.update_forward_refs()
         return MangaFetched(entity=obj)
-
-    def is_cached(self) -> bool:
-        if self.cached_in is not None:
-            return True
-        return False
-
-    def flush_cache(self) -> MangaFlushed:
-        self.cached_in = None
-        self.updated_at = now()
-        return MangaFlushed(updated_at=self.updated_at)
-
-    def sync_cache(self, cached_in: pathlib.Path) -> MangaCached:
-        self.cached_in = cached_in
-        self.updated_at = now()
-        return MangaCached(
-            cached_in=self.cached_in,
-            updated_at=self.updated_at,
-        )
-
-    def update(self, title: str) -> MangaUpdated:
-        self.title = title
-        self.updated_at = now()
-        return MangaUpdated(
-            title=self.title,
-            updated_at=self.updated_at,
-        )

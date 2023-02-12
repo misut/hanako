@@ -6,7 +6,7 @@ from kyrie.models import Command, DomainEvent
 from kyrie.monads import Option
 
 
-class NotOccured(DomainEvent):
+class Always(DomainEvent):
     ...
 
 
@@ -49,5 +49,6 @@ class CommandBus(NamedTuple):
             command, self.context, *args, **kwargs
         )
 
-        event = result.unwrap_or(NotOccured())
-        await self.event_handler.handle(event, self.context, *args, **kwargs)
+        event = result.unwrap_or(Always())
+        if type(event) in self.event_handler:
+            await self.event_handler.handle(event, self.context, *args, **kwargs)

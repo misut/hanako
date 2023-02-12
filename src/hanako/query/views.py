@@ -6,6 +6,7 @@ class MangaView(View):
 
     id: IDType
     title: str
+    thumbnail: str
 
 
 class PoolView(View):

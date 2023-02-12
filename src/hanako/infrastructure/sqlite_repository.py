@@ -61,6 +61,7 @@ class SqliteMangaRepository(SqliteRepository[MangaView, MangaOrm]):
         return MangaView(
             id=orm.id,
             title=orm.title,
+            thumbnail=orm.thumbnail,
         )
 
 

@@ -5,7 +5,7 @@ from kyrie.models import IDType
 from hanako.domain import HitomiGallery, HitomiPage
 
 
-class HitomiService(abc.ABC):
+class HitomiFetcher(abc.ABC):
     @abc.abstractmethod
     async def fetch_gallery_ids(
         self, language: str, offset: int, limit: int
@@ -17,9 +17,9 @@ class HitomiService(abc.ABC):
         ...
 
     @abc.abstractmethod
-    async def download_page(self, gallery_id: IDType, page: HitomiPage) -> bytes:
+    async def fetch_thumbnail(self, gallery: HitomiGallery) -> str:
         ...
 
     @abc.abstractmethod
-    async def download_gallery(self, gallery: HitomiGallery) -> list[bytes]:
+    def generate_page_url(self, page: HitomiPage) -> str:
         ...

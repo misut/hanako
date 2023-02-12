@@ -1,5 +1,6 @@
 from kyrie.frameworks import CommandHandler
 from kyrie.models import Command, IDType
+from kyrie.monads import Option, Some, Null
 
 from hanako import domain
 from hanako.command.context import HanakoCommandContext
@@ -11,15 +12,25 @@ class FetchManga(Command):
 
 async def fetch_manga(
     command: FetchManga, context: HanakoCommandContext
-) -> domain.MangaFetched:
-    hitomi = context.hitomi_service()
+) -> Option[domain.MangaFetched]:
+    hitomi_fetcher = context.hitomi_fetcher()
     manga_storage = context.manga_storage()
 
-    gallery = await hitomi.fetch_gallery(command.manga_id)
-    event = domain.Manga.create(gallery.id, gallery.title)
+    gallery = await hitomi_fetcher.fetch_gallery(command.manga_id)
+    thumbnail = await hitomi_fetcher.fetch_thumbnail(gallery)
+    pages = [
+        dict(url=hitomi_fetcher.generate_page_url(page), **page.dict())
+        for page in gallery.pages
+    ]
+    event = domain.Manga.create(
+        id=gallery.id,
+        title=gallery.title,
+        thumbnail=thumbnail,
+        pages=pages,
+    )
     await manga_storage.save_one(event.entity)
 
-    return event
+    return Some(event)
 
 
 class FetchPool(Command):
@@ -30,11 +41,11 @@ class FetchPool(Command):
 
 async def fetch_pool(
     command: FetchPool, context: HanakoCommandContext
-) -> domain.PoolFetched:
-    hitomi = context.hitomi_service()
+) -> Option[domain.PoolFetched]:
+    hitomi_fetcher = context.hitomi_fetcher()
     pool_storage = context.pool_storage()
 
-    manga_ids = await hitomi.fetch_gallery_ids(
+    manga_ids = await hitomi_fetcher.fetch_gallery_ids(
         command.language, command.offset, command.limit
     )
     event = domain.Pool.create(
@@ -42,7 +53,7 @@ async def fetch_pool(
     )
     await pool_storage.save_one(event.entity)
 
-    return event
+    return Some(event)
 
 
 command_handler = CommandHandler.new(

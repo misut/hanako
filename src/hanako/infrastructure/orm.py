@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, Enum, Integer, String, orm
+from sqlalchemy import JSON, Column, DateTime, Enum, Integer, String, Text, orm
 
 from hanako.domain import MangaLanguage
 
@@ -12,6 +12,8 @@ class MangaOrm(BaseOrm):
 
     id: str = Column(String(16), primary_key=True)
     title: str = Column(String(256), index=True, nullable=False)
+    thumbnail: str = Column(Text, nullable=False)
+    pages: list[dict[str, int | str]] = Column(JSON, nullable=False)
 
     cached_in: str = Column(String(256), nullable=True)
     fetched_at: datetime = Column(DateTime, nullable=False)

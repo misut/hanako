@@ -23,7 +23,6 @@ class BaseHandler(
     @classmethod
     def _create_tpl(cls, processor: Processor) -> tuple[type[Target], Processor]:
         sig = inspect.signature(processor)
-        print(sig.return_annotation)
         params = iter(sig.parameters.values())
 
         first = next(params, None)

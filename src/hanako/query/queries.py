@@ -4,6 +4,8 @@ from kyrie.models import IDType, Query
 from hanako.query.context import HanakoQueryContext
 from hanako.query.views import MangaView
 
+__all__ = ("GetManga",)
+
 
 class GetManga(Query):
     manga_id: IDType

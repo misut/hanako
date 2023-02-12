@@ -42,8 +42,6 @@ class BaseModel(pydantic.BaseModel):
 
 
 class Entity(BaseModel):
-    id: IDType
-
     class Config:
         underscore_attrs_are_private = True
 

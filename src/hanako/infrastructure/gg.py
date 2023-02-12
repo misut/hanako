@@ -1,5 +1,7 @@
+import asyncio
+
 import urllib.request
-from typing import Protocol
+from typing import Protocol, Self
 
 import js2py
 
@@ -21,9 +23,14 @@ class GG(Protocol):
 class GGjs(GG):
     _ggjs: js2py.base.JsObjectWrapper
 
-    def __init__(self, url: str = DEFAULT_GGJS_URL) -> None:
-        with urllib.request.urlopen(url) as response:
-            self._ggjs = js2py.eval_js(response.read().decode("utf-8"))
+    def __init__(self, ggjs: js2py.base.JsObjectWrapper) -> None:
+        self._ggjs = ggjs
+
+    @classmethod
+    async def create(cls, url: str = DEFAULT_GGJS_URL) -> Self:
+        loop = asyncio.get_event_loop()
+        response = await loop.run_in_executor(None, urllib.request.urlopen, url)
+        return cls(ggjs=js2py.eval_js(response.read().decode("utf-8")))
 
     @property
     def b(self) -> str:
