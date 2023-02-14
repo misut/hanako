@@ -28,7 +28,7 @@ _isort = "isort ."
 format = ["_black", "_isort"]
 
 unittest = "pytest -vvsx tests"
-coverage = "pytest --cov=src/hanako tests"
+coverage = "pytest --cov=src/kyrie tests"
 
 
 [build-system]

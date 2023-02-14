@@ -6,8 +6,8 @@ from hanako.command.hitomi_downloader import HitomiDownloader
 
 __all__ = (
     "HanakoCommandContext",
-    "HitomiFetcher",
     "HitomiDownloader",
+    "HitomiFetcher",
     "MangaStorage",
     "command_handler",
     "event_handler",

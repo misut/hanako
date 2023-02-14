@@ -1,14 +1,14 @@
 import pytest
 import pytest_asyncio
 
-from hanako.infrastructure import GGjs, HttpClient, HttpHitomiService
+from hanako.infrastructure import GGjs, HttpClient, HttpHitomiFetcher
 
 
 @pytest_asyncio.fixture(name="hitomi")
-async def get_hitomi() -> HttpHitomiService:
+async def get_hitomi_fetcher() -> HttpHitomiFetcher:
     http_client = HttpClient()
     ggjs = await GGjs.create()
-    return HttpHitomiService(http_client.client, ggjs)
+    return HttpHitomiFetcher(http_client.client, ggjs)
 
 
 @pytest.mark.asyncio
@@ -21,7 +21,7 @@ async def get_hitomi() -> HttpHitomiService:
     ],
 )
 async def test_fetch_gallery_ids(
-    hitomi: HttpHitomiService, language: str, offset: int, limit: int
+    hitomi: HttpHitomiFetcher, language: str, offset: int, limit: int
 ) -> None:
     await hitomi.fetch_gallery_ids(language, offset, limit)
 
@@ -36,7 +36,7 @@ async def test_fetch_gallery_ids(
     ],
 )
 async def test_fetch_gallery(
-    hitomi: HttpHitomiService, expected_id: str, expected_title: str
+    hitomi: HttpHitomiFetcher, expected_id: str, expected_title: str
 ) -> None:
     gallery = await hitomi.fetch_gallery(expected_id)
     assert gallery.id == expected_id
