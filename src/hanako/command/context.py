@@ -1,15 +1,22 @@
+import abc
 from dataclasses import dataclass
 
 from kyrie.context import Provider
 from kyrie.frameworks import CommandContext
 from kyrie.interfaces import Storage
+from kyrie.monads import Option
 
 from hanako import domain
 from hanako.command.hitomi_fetcher import HitomiFetcher
 from hanako.command.hitomi_downloader import HitomiDownloader
 
 MangaStorage = Storage[domain.Manga]
-PoolStorage = Storage[domain.Pool]
+
+
+class PoolStorage(Storage[domain.Pool]):
+    @abc.abstractmethod
+    async def find_one(self, **filters: object) -> Option[domain.Pool]:
+        ...
 
 
 @dataclass(frozen=True)

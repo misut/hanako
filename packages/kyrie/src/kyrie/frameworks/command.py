@@ -2,7 +2,7 @@ from typing import Any, NamedTuple, Self
 
 from kyrie.context import Context
 from kyrie.handler import BaseHandler
-from kyrie.models import Command, DomainEvent
+from kyrie.models import Command, DomainEvent, IDType
 from kyrie.monads import Option
 
 
@@ -44,11 +44,13 @@ class CommandBus(NamedTuple):
             event_handler=event_handler,
         )
 
-    async def dispatch(self, command: Command, *args: Any, **kwargs: Any) -> None:
+    async def dispatch(self, command: Command, *args: Any, **kwargs: Any) -> IDType:
         result = await self.command_handler.handle(
             command, self.context, *args, **kwargs
         )
 
-        event = result.unwrap_or(Always())
+        event = result.unwrap_or(Always(entity_id=""))
         if type(event) in self.event_handler:
             await self.event_handler.handle(event, self.context, *args, **kwargs)
+
+        return event.entity_id

@@ -23,7 +23,7 @@ IDType = str
 
 
 def generate_id() -> IDType:
-    return cast(IDType, uuid.uuid4())
+    return cast(IDType, str(uuid.uuid4()))
 
 
 now = datetime.now
@@ -70,6 +70,7 @@ class Query(ImmutableModel):
 class DomainEvent(ImmutableModel):
     __entity_type__: ClassVar[str]
 
+    entity_id: IDType
     occurred_at: datetime = DefaultDatetimeField
 
 

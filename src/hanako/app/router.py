@@ -1,10 +1,11 @@
 from collections import UserDict
-from collections.abc import Callable, Coroutine
-from typing import Any, Self
+from collections.abc import Awaitable, Callable
+from typing import Concatenate, Self
 
 import flet
 
-Handler = Callable[[flet.Page], Coroutine[Any, Any, None]]
+
+Handler = Callable[Concatenate[flet.Page, ...], Awaitable[None]]  # type: ignore
 
 
 class Router(UserDict[str, Handler]):

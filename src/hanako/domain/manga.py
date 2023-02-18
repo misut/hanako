@@ -50,4 +50,4 @@ class Manga(AggregateRoot):
             pages=pages,
         )
         MangaFetched.update_forward_refs()
-        return MangaFetched(entity=obj)
+        return MangaFetched(entity_id=obj.id, entity=obj)

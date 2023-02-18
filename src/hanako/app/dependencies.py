@@ -12,6 +12,7 @@ from hanako.infrastructure import (
     SqliteMangaStorage,
     SqlitePoolStorage,
 )
+from hanako.infrastructure.sqlite_repository import SqlitePoolRepository
 from hanako.query import HanakoQueryContext, query_handler
 
 
@@ -42,6 +43,9 @@ async def initialize_dependencies() -> None:
     query_context = HanakoQueryContext(
         manga_repository=Provider(
             SqliteMangaRepository, session_factory=sqlite_database.session
-        )
+        ),
+        pool_repository=Provider(
+            SqlitePoolRepository, session_factory=sqlite_database.session
+        ),
     )
     initialize_query_bus(query_context, query_handler)

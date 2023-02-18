@@ -2,6 +2,7 @@ import enum
 
 
 class MangaLanguage(str, enum.Enum):
+    NONE = "none"
     ALL = "all"
     ENGLISH = "english"
     KOREAN = "korean"

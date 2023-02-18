@@ -35,8 +35,8 @@ async def fetch_manga(
 
 class FetchPool(Command):
     language: str
-    offset: int
-    limit: int
+    offset: int = 0
+    limit: int = 0
 
 
 async def fetch_pool(
@@ -52,6 +52,29 @@ async def fetch_pool(
         manga_ids, command.language, command.offset, command.limit
     )
     await pool_storage.save_one(event.entity)
+
+    return Some(event)
+
+
+class UpdatePool(Command):
+    pool_id: IDType
+
+
+async def update_pool(
+    command: UpdatePool, context: HanakoCommandContext
+) -> Option[domain.PoolUpdated]:
+    hitomi_fetcher = context.hitomi_fetcher()
+    pool_storage = context.pool_storage()
+
+    entity = await pool_storage.find_one(id=command.pool_id)
+    if not entity:
+        raise ValueError(f"Pool '{command.pool_id}' Not Fetched Before")
+    pool = entity.unwrap()
+
+    manga_ids = await hitomi_fetcher.fetch_gallery_ids(
+        pool.language, pool.offset, pool.limit
+    )
+    event = pool.update(manga_ids)
 
     return Some(event)
 

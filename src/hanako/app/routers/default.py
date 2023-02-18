@@ -1,8 +1,9 @@
-import re
 from typing import cast
-
 import flet
+
 from kyrie.frameworks import query_bus
+from kyrie.functools import async_partial
+from kyrie.models import IDType
 
 from hanako.app.router import Router
 from hanako.query import queries, views
@@ -10,63 +11,55 @@ from hanako.query import queries, views
 router = Router()
 
 
+async def translate_to_viewer(manga_id: IDType, _: flet.ControlEvent) -> None:
+    print(manga_id)
+    await _.page.go_async(f"/viewer/{manga_id}/")
+
+
+def manga_container(manga: views.MangaView) -> flet.Container:
+    return flet.Container(
+        content=flet.Row(
+            [
+                flet.Image(src_base64=manga.thumbnail, width=140),
+                flet.Column(
+                    controls=[flet.Text(value=manga.title), flet.Text(value=manga.id)]
+                ),
+            ]
+        ),
+        ink=True,
+        on_click=async_partial(translate_to_viewer, manga.id),
+    )
+
+
 @router.route("/")
 async def desktop_main(page: flet.Page) -> None:
-    page.controls.clear()
-    page.title = "Hanako"
-    page.vertical_alignment = flet.MainAxisAlignment.CENTER
+    view = flet.View(controls=[])
 
-    row = flet.Row([], alignment=flet.MainAxisAlignment.CENTER)
+    async def go_settings(_: flet.ControlEvent) -> None:
+        await page.go_async("/settings/")
 
-    async def txt_submit(e: flet.ControlEvent) -> None:
-        nonlocal row
-        row.controls.clear()
-
-        manga_id: str = e.control.value
-        if re.fullmatch(r"[0-9]+", manga_id) is None:
-            row.controls.append(flet.Text(f"Invalid Manga ID - {manga_id}"))
-            return await page.update_async()
-
-        manga_view = await query_bus().query(queries.GetManga(manga_id=manga_id))
-        if manga_view is None:
-            row.controls.append(flet.Text(f"No Manga Searched By ID - {manga_id}"))
-        else:
-            manga_view = cast(views.MangaView, manga_view)
-            row.controls.append(
-                flet.Container(
-                    content=flet.Row(
-                        [
-                            flet.Image(
-                                src_base64=manga_view.thumbnail,
-                                width=100,
-                                height=100,
-                                fit=flet.ImageFit.FIT_HEIGHT,
-                                repeat=flet.ImageRepeat.NO_REPEAT,
-                            ),
-                            flet.Text(manga_view.title),
-                        ]
-                    ),
-                    ink=True,
-                    on_click=lambda _: print("Hello, world"),
-                )
-            )
-
-        await page.update_async()
-
-    txt_search = flet.TextField(
-        autofocus=True,
-        hint_text="Please enter hitomi gallery id here",
-        keyboard_type=flet.KeyboardType.NUMBER,
-        label="Search",
-        on_submit=txt_submit,
-        prefix_icon=flet.icons.SEARCH,
-        width=400,
+    btn_go_settings = flet.FloatingActionButton(
+        icon=flet.icons.SETTINGS_OUTLINED,
+        on_click=go_settings,
+        shape=flet.CircleBorder(),
     )
+    view.floating_action_button = btn_go_settings
 
-    await page.add_async(
-        flet.Row(
-            [txt_search],
-            alignment=flet.MainAxisAlignment.CENTER,
-        ),
-        row,
-    )
+    lv = flet.ListView(controls=[], expand=True, spacing=10)
+    view.controls.append(lv)
+
+    manga_ids = ["2466885", "2466883", "2466879", "2466877", "2466876"]
+    mangas: list[views.MangaView] = []
+    for manga_id in manga_ids:
+        manga = await query_bus().query(queries.GetManga(manga_id=manga_id))
+        if manga is None:
+            continue
+
+        manga = cast(views.MangaView, manga)
+        mangas.append(manga)
+
+    for manga in mangas:
+        lv.controls.append(manga_container(manga))
+
+    page.views.append(view)
+    await page.update_async()

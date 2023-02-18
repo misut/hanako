@@ -4,7 +4,7 @@ from hanako.domain.manga import (
     MangaFetched,
 )
 from hanako.domain.models import *
-from hanako.domain.pool import Pool, PoolFetched
+from hanako.domain.pool import Pool, PoolFetched, PoolUpdated
 
 __all__ = (
     "MangaLanguage",
@@ -12,4 +12,5 @@ __all__ = (
     "MangaFetched",
     "Pool",
     "PoolFetched",
+    "PoolUpdated",
 )

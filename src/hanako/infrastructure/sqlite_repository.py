@@ -62,6 +62,8 @@ class SqliteMangaRepository(SqliteRepository[MangaView, MangaOrm]):
             id=orm.id,
             title=orm.title,
             thumbnail=orm.thumbnail,
+            fetched_at=orm.fetched_at,
+            updated_at=orm.updated_at,
         )
 
 
@@ -73,4 +75,9 @@ class SqlitePoolRepository(SqliteRepository[PoolView, PoolOrm]):
         return PoolView(
             id=orm.id,
             manga_ids=orm.manga_ids,
+            language=orm.language,
+            offset=orm.offset,
+            limit=orm.limit,
+            fetched_at=orm.fetched_at,
+            updated_at=orm.updated_at,
         )

@@ -29,6 +29,7 @@ skip_empty = true
 profile = "black"
 
 [tool.mypy]
+enable_incomplete_feature = ["TypeVarTuple"]
 plugins = ["pydantic.mypy", "sqlalchemy.ext.mypy.plugin"]
 pretty = true
 
@@ -62,7 +63,7 @@ _black = "black ."
 _isort = "isort ."
 format = ["_black", "_isort"]
 
-typetest = "mypy"
+typetest = "mypy src tests"
 unittest = "pytest -vvsx tests"
 coverage = "pytest --cov=src/hanako tests"
 

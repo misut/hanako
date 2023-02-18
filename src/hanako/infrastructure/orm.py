@@ -28,3 +28,6 @@ class PoolOrm(BaseOrm):
     language: MangaLanguage = Column(Enum(MangaLanguage), index=True, nullable=False)
     offset: int = Column(Integer, nullable=False)
     limit: int = Column(Integer, nullable=False)
+
+    fetched_at: datetime = Column(DateTime, nullable=False)
+    updated_at: datetime = Column(DateTime, nullable=False)

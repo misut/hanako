@@ -5,6 +5,7 @@ DEFAULT_HANAKO_SETTINGS_KEY = "hanako.settings"
 
 
 class Settings(pydantic.BaseSettings):
+    developer_mode: bool = False
     refresh_on_startup: bool = False
     theme_mode: flet.ThemeMode = flet.ThemeMode.SYSTEM
 

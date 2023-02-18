@@ -9,6 +9,12 @@ packages = [
 ]
 
 
+[tool.mypy]
+enable_incomplete_feature = ["TypeVarTuple"]
+plugins = ["pydantic.mypy"]
+pretty = true
+
+
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^1.10.4"
@@ -27,6 +33,7 @@ _black = "black ."
 _isort = "isort ."
 format = ["_black", "_isort"]
 
+typetest = "mypy src tests"
 unittest = "pytest -vvsx tests"
 coverage = "pytest --cov=src/kyrie tests"
 

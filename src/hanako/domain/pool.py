@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 from kyrie.models import (
     AggregateRoot,
@@ -20,6 +19,10 @@ class PoolFetched(_PoolEvent):
     entity: "Pool"
 
 
+class PoolUpdated(_PoolEvent):
+    manga_ids: list[IDType]
+
+
 class Pool(AggregateRoot):
     id: IDType = DefaultIDField
     manga_ids: list[IDType]
@@ -28,6 +31,7 @@ class Pool(AggregateRoot):
     limit: int
 
     fetched_at: datetime = DefaultDatetimeField
+    updated_at: datetime = DefaultDatetimeField
 
     @classmethod
     def create(
@@ -37,7 +41,7 @@ class Pool(AggregateRoot):
         offset: int,
         limit: int,
     ) -> PoolFetched:
-        if language not in MangaLanguage:
+        if not any(language == member.value for member in MangaLanguage):
             raise ValueError(f"Language '{language}' Not Supported")
         obj = cls(
             manga_ids=manga_ids,
@@ -45,4 +49,11 @@ class Pool(AggregateRoot):
             offset=offset,
             limit=limit,
         )
+        PoolFetched.update_forward_refs()
         return PoolFetched(entity_id=obj.id, entity=obj)
+
+    def update(self, manga_ids: list[IDType]) -> PoolUpdated:
+        if set(self.manga_ids) > set(manga_ids):
+            raise ValueError(f"Not Completely Including Current Pool")
+        self.manga_ids = manga_ids
+        return PoolUpdated(entity_id=self.id, manga_ids=manga_ids)

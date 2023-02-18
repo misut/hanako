@@ -1,9 +1,9 @@
-import abc
 from collections.abc import Callable
 from typing import ClassVar, Generic, TypeVar
 
 from kyrie.interfaces import Storage
 from kyrie.models import Entity
+from kyrie.monads import Option, Some, Null
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext import asyncio as aiosqlalchemyorm
@@ -38,14 +38,14 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
 
     async def save_one(self, entity: Obj) -> None:
         stmt = select(self.__orm_type__)
-        stmt = stmt.filter_by(id=entity.id)
+        stmt = stmt.filter_by(id=getattr(entity, "id"))
 
         async with self._session_factory() as session:
             result = await session.execute(stmt)
             orm = result.scalar()
             if orm is None:
                 orm = self.__orm_type__()
-                setattr(orm, "id", entity.id)
+                setattr(orm, "id", getattr(entity, "id"))
                 session.add(orm)
 
             for k, v in entity.dict(exclude={"id"}).items():
@@ -59,3 +59,15 @@ class SqliteMangaStorage(SqliteStorage[Manga, MangaOrm]):
 
 class SqlitePoolStorage(SqliteStorage[Pool, PoolOrm]):
     __orm_type__ = PoolOrm
+
+    async def find_one(self, **filters: object) -> Option[Pool]:
+        stmt = select(self.__orm_type__)
+        stmt = stmt.filter_by(**filters)
+
+        async with self._session_factory() as session:
+            result = await session.execute(stmt)
+            orm = result.scalar()
+
+        if orm is None:
+            return Null
+        return Some(Pool.parse_obj(orm))
