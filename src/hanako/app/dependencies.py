@@ -4,15 +4,16 @@ from kyrie.frameworks import initialize_command_bus, initialize_query_bus
 from hanako.command import HanakoCommandContext, command_handler, event_handler
 from hanako.infrastructure import (
     GGjs,
+    HitomiGalleryService,
+    HitomiMangaDownloader,
     HttpClient,
-    HttpHitomiDownloader,
-    HttpHitomiFetcher,
     SqliteDatabase,
     SqliteMangaRepository,
     SqliteMangaStorage,
+    SqlitePoolRepository,
     SqlitePoolStorage,
 )
-from hanako.infrastructure.sqlite_repository import SqlitePoolRepository
+from hanako.infrastructure.local_manga_cache import LocalMangaCache
 from hanako.query import HanakoQueryContext, query_handler
 
 
@@ -25,11 +26,12 @@ async def initialize_dependencies() -> None:
     await sqlite_database.create_all()
 
     command_context = HanakoCommandContext(
-        hitomi_downloader=Provider(
-            HttpHitomiDownloader, client_factory=http_client.client
+        gallery_service=Provider(
+            HitomiGalleryService, client_factory=http_client.client, gg=gg
         ),
-        hitomi_fetcher=Provider(
-            HttpHitomiFetcher, client_factory=http_client.client, gg=gg
+        manga_cache=Provider(LocalMangaCache, cache_dir=".cache", missing_ok=True),
+        manga_downloader=Provider(
+            HitomiMangaDownloader, client_factory=http_client.client
         ),
         manga_storage=Provider(
             SqliteMangaStorage, session_factory=sqlite_database.session

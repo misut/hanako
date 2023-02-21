@@ -47,7 +47,8 @@ class Entity(BaseModel):
 
 
 class AggregateRoot(Entity):
-    ...
+    class Config:
+        orm_mode = True
 
 
 class ImmutableModel(BaseModel):

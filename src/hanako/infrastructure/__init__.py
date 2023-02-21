@@ -1,8 +1,8 @@
-from hanako.infrastructure.file_exporter import FileExporter
-from hanako.infrastructure.gg import GG, GGjs
+from hanako.infrastructure.hitomi import GG, GGjs
+from hanako.infrastructure.hitomi_gallery_service import HitomiGalleryService
+from hanako.infrastructure.hitomi_manga_downloader import HitomiMangaDownloader
 from hanako.infrastructure.http_client import HttpClient
-from hanako.infrastructure.http_hitomi_downloader import HttpHitomiDownloader
-from hanako.infrastructure.http_hitomi_fetcher import HttpHitomiFetcher
+from hanako.infrastructure.local_filesystem import LocalFilesystem
 from hanako.infrastructure.sqlite_database import SqliteDatabase
 from hanako.infrastructure.sqlite_repository import (
     SqliteMangaRepository,
@@ -14,9 +14,10 @@ __all__ = (
     "FileExporter",
     "GG",
     "GGjs",
+    "HitomiGalleryService",
+    "HitomiMangaDownloader",
     "HttpClient",
-    "HttpHitomiDownloader",
-    "HttpHitomiFetcher",
+    "LocalFilesystem",
     "SqliteDatabase",
     "SqliteMangaRepository",
     "SqliteMangaStorage",

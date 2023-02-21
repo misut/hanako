@@ -1,7 +1,7 @@
 import flet
 
 from hanako.app.routers import endpoint
-from hanako.app.settings import initialize_settings, load_settings
+from hanako.app.settings import initialize_settings
 
 
 async def desktop_app(page: flet.Page) -> None:

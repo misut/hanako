@@ -3,7 +3,7 @@ from typing import ClassVar, Generic, TypeVar
 
 from kyrie.interfaces import Storage
 from kyrie.models import Entity
-from kyrie.monads import Option, Some, Null
+from kyrie.monads import Null, Option, Some
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext import asyncio as aiosqlalchemyorm
@@ -16,6 +16,7 @@ Orm = TypeVar("Orm", bound=BaseOrm)
 
 
 class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
+    __obj_type__: ClassVar[type[Obj]]  # type: ignore
     __orm_type__: ClassVar[type[Orm]]  # type: ignore
 
     _session_factory: Callable[..., aiosqlalchemyorm.AsyncSession]
@@ -24,6 +25,18 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
         self, session_factory: Callable[..., aiosqlalchemyorm.AsyncSession]
     ) -> None:
         self._session_factory = session_factory
+
+    async def find_one(self, **filters: object) -> Option[Obj]:
+        stmt = select(self.__orm_type__)
+        stmt = stmt.filter_by(**filters)
+
+        async with self._session_factory() as session:
+            result = await session.execute(stmt)
+            orm = result.scalar()
+
+        if orm is None:
+            return Null
+        return Some(self.__obj_type__.from_orm(orm))
 
     async def save(self, *entities: Obj) -> None:
         stmt = insert(self.__orm_type__)
@@ -54,20 +67,10 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
 
 
 class SqliteMangaStorage(SqliteStorage[Manga, MangaOrm]):
+    __obj_type__ = Manga
     __orm_type__ = MangaOrm
 
 
 class SqlitePoolStorage(SqliteStorage[Pool, PoolOrm]):
+    __obj_type__ = Pool
     __orm_type__ = PoolOrm
-
-    async def find_one(self, **filters: object) -> Option[Pool]:
-        stmt = select(self.__orm_type__)
-        stmt = stmt.filter_by(**filters)
-
-        async with self._session_factory() as session:
-            result = await session.execute(stmt)
-            orm = result.scalar()
-
-        if orm is None:
-            return Null
-        return Some(Pool.parse_obj(orm))

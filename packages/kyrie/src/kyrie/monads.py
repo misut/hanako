@@ -10,7 +10,7 @@ __all__ = (
     "Some",
 )
 
-E = TypeVar("E")
+E = TypeVar("E", bound=Exception)
 T = TypeVar("T")
 U = TypeVar("U")
 
@@ -80,9 +80,8 @@ class Result(Generic[T, E]):
     _ok: T | None
     _err: E | None
 
-    def __init__(self, ok: T | None, err: None | E) -> None:
-        assert ok and err
-        assert not ok and not err
+    def __init__(self, ok: T | None = None, err: None | E = None) -> None:
+        assert not ok or not err
         self._ok = ok
         self._err = err
 
@@ -94,6 +93,32 @@ class Result(Generic[T, E]):
 
     def is_err(self) -> bool:
         return self._err is not None
+
+    def expect(self, error_message: str) -> T:
+        if self._ok is None:
+            raise ValueError(error_message)
+        return self._ok
+
+    def expect_err(self, error_message: str) -> E:
+        if self._err is None:
+            raise ValueError(error_message)
+        return self._err
+
+    def unwrap(self) -> T:
+        if self._ok is None:
+            raise ValueError()
+        return self._ok
+
+    def unwrap_err(self) -> E:
+        if self._err is None:
+            raise ValueError()
+        return self._err
+
+    def unwrap_or(self, default: T) -> T:
+        return self._ok or default
+
+    def unwrap_or_else(self, func: Callable[[], T]) -> T:
+        return self._ok or func()
 
 
 def Ok(value: T) -> Result[T, E]:

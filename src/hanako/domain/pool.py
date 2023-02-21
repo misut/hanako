@@ -20,12 +20,12 @@ class PoolFetched(_PoolEvent):
 
 
 class PoolUpdated(_PoolEvent):
-    manga_ids: list[IDType]
+    id_list: list[IDType]
 
 
 class Pool(AggregateRoot):
     id: IDType = DefaultIDField
-    manga_ids: list[IDType]
+    id_list: list[IDType]
     language: MangaLanguage
     offset: int
     limit: int
@@ -34,26 +34,13 @@ class Pool(AggregateRoot):
     updated_at: datetime = DefaultDatetimeField
 
     @classmethod
-    def create(
-        cls,
-        manga_ids: list[str],
-        language: str,
-        offset: int,
-        limit: int,
-    ) -> PoolFetched:
-        if not any(language == member.value for member in MangaLanguage):
-            raise ValueError(f"Language '{language}' Not Supported")
-        obj = cls(
-            manga_ids=manga_ids,
-            language=MangaLanguage(language),
-            offset=offset,
-            limit=limit,
-        )
+    def create(cls, **kwargs: object) -> PoolFetched:
+        obj = cls(**kwargs)
         PoolFetched.update_forward_refs()
         return PoolFetched(entity_id=obj.id, entity=obj)
 
-    def update(self, manga_ids: list[IDType]) -> PoolUpdated:
-        if set(self.manga_ids) > set(manga_ids):
+    def update(self, id_list: list[IDType]) -> PoolUpdated:
+        if set(self.id_list) > set(id_list):
             raise ValueError(f"Not Completely Including Current Pool")
-        self.manga_ids = manga_ids
-        return PoolUpdated(entity_id=self.id, manga_ids=manga_ids)
+        self.id_list = id_list
+        return PoolUpdated(entity_id=self.id, id_list=id_list)

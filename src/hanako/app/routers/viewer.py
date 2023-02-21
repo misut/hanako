@@ -16,5 +16,8 @@ async def desktop_viewer(page: flet.Page, manga_id: IDType) -> None:
     )
     view.controls.append(app_bar)
 
+    lv = flet.ListView(controls=[])
+    view.controls.append(lv)
+
     page.views.append(view)
     await page.update_async()

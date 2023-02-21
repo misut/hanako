@@ -16,11 +16,11 @@ class Context:
 
 
 class Provider(Generic[T]):
-    _provider: Callable[..., T]
+    _provider: type[T]
     _args: tuple[Any, ...]
     _kwargs: dict[str, Any]
 
-    def __init__(self, provider: Callable[..., T], *args: Any, **kwargs: Any) -> None:
+    def __init__(self, provider: type[T], *args: Any, **kwargs: Any) -> None:
         self._provider = provider
         self._args = args
         self._kwargs = kwargs

@@ -1,4 +1,5 @@
 from typing import Any
+
 import pydantic
 from kyrie.models import IDType, ImmutableModel, ValueObject
 

@@ -4,7 +4,6 @@ from typing import Concatenate, Self
 
 import flet
 
-
 Handler = Callable[Concatenate[flet.Page, ...], Awaitable[None]]  # type: ignore
 
 

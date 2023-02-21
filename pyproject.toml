@@ -36,20 +36,19 @@ pretty = true
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 aiofiles = "^23.1.0"
-aiosqlite = "^0.18.0"
 flet = "^0.4.0"
 httpx = "^0.23.3"
 js2py = "^0.74"
 kyrie = {path = "packages/kyrie", develop = true}
 loguru = "^0.6.0"
 pydantic = "^1.10.4"
-sqlalchemy = {extras = ["asyncio", "mypy"], version = "^2.0.2"}
+sqlalchemy = {extras = ["aiosqlite", "asyncio", "mypy"], version = "^2.0.3"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 isort = "^5.11.4"
 mypy = "^1.0.0"
-pyinstaller = "^5.7.0"
+pyinstaller = "5.7.0"
 pytest = "^7.2.1"
 pytest-asyncio = "^0.20.3"
 pytest-cov = "^4.0.0"
@@ -63,9 +62,15 @@ _black = "black ."
 _isort = "isort ."
 format = ["_black", "_isort"]
 
+fasttest = "pytest -vvsx tests"
 typetest = "mypy src tests"
-unittest = "pytest -vvsx tests"
+unittest = "pytest -vvsx --slow tests"
 coverage = "pytest --cov=src/hanako tests"
+
+build = "flet pack src/hanako/main.py"
+
+[tool.pytest.ini_options]
+markers = ["slow"]
 
 [build-system]
 requires = ["poetry-core"]

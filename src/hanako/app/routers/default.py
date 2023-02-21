@@ -1,6 +1,6 @@
 from typing import cast
-import flet
 
+import flet
 from kyrie.frameworks import query_bus
 from kyrie.functools import async_partial
 from kyrie.models import IDType

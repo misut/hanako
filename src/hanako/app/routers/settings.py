@@ -5,6 +5,7 @@ from typing import Any, cast
 
 import flet
 from kyrie.frameworks import command_bus, query_bus
+from kyrie.functools import async_partial
 
 from hanako.app.router import Router
 from hanako.app.settings import load_settings, save_settings
@@ -245,6 +246,11 @@ async def desktop_developer_settings(page: flet.Page) -> None:
 
     container = wrap_with_container()
 
+    async def click_manga(manga_id: str, _: flet.ControlEvent) -> None:
+        print("started")
+        await command_bus().dispatch(commands.CacheManga(manga_id=manga_id))
+        print("finished")
+
     async def txt_submit(e: flet.ControlEvent) -> None:
         nonlocal container
         row: flet.Row = container.content
@@ -275,7 +281,7 @@ async def desktop_developer_settings(page: flet.Page) -> None:
                         ]
                     ),
                     ink=True,
-                    on_click=lambda _: print("Hello, world"),
+                    on_click=async_partial(click_manga, manga_view.id),
                 )
             )
 
