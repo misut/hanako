@@ -7,6 +7,7 @@ import pydantic
 from kyrie.models import IDType, ValueObject
 
 DEFAULT_GGJS_URL = "https://ltn.hitomi.la/gg.js"
+DEFAULT_HITOMI_BATCH_SIZE = 10
 
 
 def create_image_headers(gallery_id: IDType) -> dict[str, str]:
@@ -67,8 +68,12 @@ class HitomiPage(ValueObject):
     height: int
     hash: str
 
-    hasavif: bool | None
-    haswebp: bool | None
+    hasavif: bool
+    haswebp: bool
+
+    @pydantic.validator("hasavif", "haswebp", pre=True)
+    def parse_none(cls, value: None | object) -> bool | object:
+        return value or False
 
 
 class HitomiTag(ValueObject):

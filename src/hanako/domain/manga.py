@@ -17,7 +17,9 @@ class MangaArtist(Entity):
 
 class MangaPage(Entity):
     filename: str
-    url: str
+    hash: str
+    hasavif: bool
+    haswebp: bool
 
     cached_in: str | None = None
 

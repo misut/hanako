@@ -11,7 +11,7 @@ class GalleryService(abc.ABC):
     @abc.abstractmethod
     async def fetch_galleries(
         self, *gallery_ids: IDType
-    ) -> list[Result[domain.Gallery, FetchError]]:
+    ) -> Result[list[domain.Gallery], FetchError]:
         ...
 
     @abc.abstractmethod

@@ -1,6 +1,6 @@
 import pytest
 
-from hanako.command import command_handler, HanakoCommandContext, commands
+from hanako.command import HanakoCommandContext, command_handler, commands
 
 
 @pytest.mark.asyncio

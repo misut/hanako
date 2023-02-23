@@ -2,13 +2,14 @@ import pytest
 import pytest_asyncio
 
 from hanako import domain
-from hanako.infrastructure import HitomiMangaDownloader, HttpClient
+from hanako.infrastructure import GGjs, HitomiMangaDownloader, HttpClient
 
 
 @pytest_asyncio.fixture(name="hitomi")
 async def initialize_hitomi_manga_downloader() -> HitomiMangaDownloader:
     http_client = HttpClient()
-    return HitomiMangaDownloader(client_factory=http_client.client)
+    ggjs = await GGjs.create()
+    return HitomiMangaDownloader(client_factory=http_client.client, gg=ggjs)
 
 
 @pytest.mark.asyncio

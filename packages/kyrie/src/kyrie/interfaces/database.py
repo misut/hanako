@@ -8,7 +8,7 @@ T = TypeVar("T")
 
 class Repository(abc.ABC, Generic[T]):
     @abc.abstractmethod
-    async def find(self, offset: int, limit: int, **filters: object) -> tuple[T, ...]:
+    async def find(self, offset: int, limit: int, **filters: object) -> list[T]:
         ...
 
     @abc.abstractmethod

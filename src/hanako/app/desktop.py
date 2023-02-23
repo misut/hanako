@@ -6,6 +6,8 @@ from hanako.app.settings import initialize_settings
 
 async def desktop_app(page: flet.Page) -> None:
     page.title = "Hanako"
+    page.horizontal_alignment = flet.CrossAxisAlignment.CENTER
+    page.vertical_alignment = flet.MainAxisAlignment.CENTER
     await initialize_settings(page)
 
     async def route_change(e: flet.RouteChangeEvent) -> None:
@@ -22,11 +24,11 @@ async def desktop_app(page: flet.Page) -> None:
                 continue
 
             handler = endpoint.router[route]
-            return await handler(page, **troute._TemplateRoute__last_params)
+            return await handler(page=page, **troute._TemplateRoute__last_params)
 
         raise ValueError(f"Unknown Route {e.route}")
 
-    async def view_pop(e: flet.ViewPopEvent) -> None:
+    async def view_pop(_: flet.ViewPopEvent) -> None:
         page.views.pop()
         top_view = page.views[-1]
         await page.go_async(top_view.route)

@@ -3,14 +3,13 @@ from collections.abc import Sequence
 import pytest
 import pytest_asyncio
 
-from hanako.infrastructure import GGjs, HttpClient, HitomiGalleryService
+from hanako.infrastructure import HitomiGalleryService, HttpClient
 
 
 @pytest_asyncio.fixture(name="hitomi")
 async def initialize_hitomi_gallery_service() -> HitomiGalleryService:
     http_client = HttpClient()
-    ggjs = await GGjs.create()
-    return HitomiGalleryService(http_client.client, ggjs)
+    return HitomiGalleryService(http_client.client)
 
 
 @pytest.mark.asyncio
@@ -50,7 +49,9 @@ async def test_fetch_galleries(
     expected_ids: Sequence[str],
     expected_titles: Sequence[str],
 ) -> None:
-    for idx, fetched in enumerate(await hitomi.fetch_galleries(*expected_ids)):
-        gallery = fetched.unwrap()
+    fetched = await hitomi.fetch_galleries(*expected_ids)
+    assert fetched
+
+    for idx, gallery in enumerate(fetched.unwrap()):
         assert gallery.id == expected_ids[idx]
         assert gallery.title == expected_titles[idx]

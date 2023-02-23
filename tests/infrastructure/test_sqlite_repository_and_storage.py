@@ -25,4 +25,5 @@ async def test_manga(db: SqliteDatabase) -> None:
     assert expected[0].thumbnail == result.thumbnail
 
     await store.save(*expected)
-    await repo.find(0, 0)
+    results = await repo.find(0, len(expected))
+    assert len(results) == len(expected)

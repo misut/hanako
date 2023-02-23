@@ -1,4 +1,4 @@
-from kyrie.models import Command, IDType
+from kyrie.models import Command, IDType, MultiCommand
 
 __all__ = (
     "CacheManga",
@@ -12,8 +12,10 @@ class FetchManga(Command):
     manga_id: IDType
 
 
-class FetchMangaUsingPool(Command):
+class FetchMangaUsingPool(MultiCommand):
     pool_id: IDType
+    offset: int = 0
+    limit: int = 0
 
 
 class CacheManga(Command):

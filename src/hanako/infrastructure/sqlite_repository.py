@@ -31,14 +31,14 @@ class SqliteRepository(Repository[Obj], Generic[Obj, Orm]):
     def orm_to_obj(self, orm: Orm) -> Obj:
         ...
 
-    async def find(self, offset: int, limit: int, **filters: object) -> tuple[Obj, ...]:
+    async def find(self, offset: int, limit: int, **filters: object) -> list[Obj]:
         stmt = select(self.__orm_type__)
         stmt = stmt.filter_by(**filters)
         stmt = stmt.limit(limit).offset(offset)
 
         async with self._session_factory() as session:
             result = await session.execute(stmt)
-        return tuple(self.__obj_type__.from_orm(orm) for orm in result.scalars().all())
+        return [self.__obj_type__.from_orm(orm) for orm in result.scalars().all()]
 
     async def find_one(self, **filters: object) -> Obj | None:
         stmt = select(self.__orm_type__)
@@ -62,6 +62,7 @@ class SqliteMangaRepository(SqliteRepository[MangaView, MangaOrm]):
             id=orm.id,
             title=orm.title,
             thumbnail=orm.thumbnail,
+            pages=orm.pages,
             fetched_at=orm.fetched_at,
             updated_at=orm.updated_at,
         )
@@ -74,7 +75,7 @@ class SqlitePoolRepository(SqliteRepository[PoolView, PoolOrm]):
     def orm_to_obj(self, orm: PoolOrm) -> PoolView:
         return PoolView(
             id=orm.id,
-            manga_ids=orm.manga_ids,
+            id_list=orm.id_list,
             language=orm.language,
             offset=orm.offset,
             limit=orm.limit,

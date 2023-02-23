@@ -3,16 +3,16 @@ from collections.abc import Sequence
 import pytest
 from kyrie.context import Provider
 from kyrie.models import IDType
-from kyrie.monads import Result, Option, Ok, Err
+from kyrie.monads import Err, Null, Ok, Option, Result, Some
 
 from hanako import domain
 from hanako.command import (
-    HanakoCommandContext,
-    GalleryService,
+    DownloadError,
     FetchError,
+    GalleryService,
+    HanakoCommandContext,
     MangaCache,
     MangaDownloader,
-    DownloadError,
     MangaStorage,
     PoolStorage,
 )
@@ -32,16 +32,13 @@ class GalleryServiceMock(GalleryService):
 
     async def fetch_galleries(
         self, *gallery_ids: IDType
-    ) -> list[Result[domain.Gallery, FetchError]]:
-        results: list[Result[domain.Gallery, FetchError]] = []
+    ) -> Result[list[domain.Gallery], FetchError]:
+        galleries: list[domain.Gallery] = []
         for gallery_id in gallery_ids:
-            result: Result[domain.Gallery, FetchError]
-            if gallery_id in self._data:
-                result = Ok(self._data[gallery_id])
-            else:
-                result = Err(FetchError(f"No Gallery With ID {gallery_id}"))
-            results.append(result)
-        return results
+            if gallery_id not in self._data:
+                continue
+            galleries.append(self._data[gallery_id])
+        return Ok(galleries)
 
     async def fetch_pool(
         self, language: str, offset: int, limit: int
@@ -83,7 +80,11 @@ class MangaStorageMock(MangaStorage):
     _data: dict[IDType, domain.Manga] = {}
 
     async def find_one(self, **filters: object) -> Option[domain.Manga]:
-        raise NotImplementedError()
+        for manga in self._data.values():
+            for key, val in filters.items():
+                if getattr(manga, key) == val:
+                    return Some(manga)
+        return Null
 
     async def save(self, *entities: domain.Manga) -> None:
         for entity in entities:

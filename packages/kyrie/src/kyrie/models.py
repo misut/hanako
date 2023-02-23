@@ -60,8 +60,16 @@ class ValueObject(ImmutableModel):
     ...
 
 
-class Command(ImmutableModel):
+class BaseCommand(ImmutableModel):
     triggered_by: str = ""
+
+
+class Command(BaseCommand):
+    ...
+
+
+class MultiCommand(BaseCommand):
+    ...
 
 
 class Query(ImmutableModel):

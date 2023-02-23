@@ -39,6 +39,9 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
         return Some(self.__obj_type__.from_orm(orm))
 
     async def save(self, *entities: Obj) -> None:
+        if len(entities) == 0:
+            return
+
         stmt = insert(self.__orm_type__)
         stmt = stmt.values([entity.dict() for entity in entities])
         stmt = stmt.on_conflict_do_update(
@@ -48,6 +51,7 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
 
         async with self._session_factory() as session:
             await session.execute(stmt)
+            await session.commit()
 
     async def save_one(self, entity: Obj) -> None:
         stmt = select(self.__orm_type__)

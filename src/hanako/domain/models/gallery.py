@@ -7,7 +7,9 @@ class GalleryArtist(ValueObject):
 
 class GalleryPage(ValueObject):
     filename: str
-    url: str
+    hash: str
+    hasavif: bool
+    haswebp: bool
 
 
 class GalleryTag(ValueObject):

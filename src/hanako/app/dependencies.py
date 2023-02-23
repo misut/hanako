@@ -27,11 +27,11 @@ async def initialize_dependencies() -> None:
 
     command_context = HanakoCommandContext(
         gallery_service=Provider(
-            HitomiGalleryService, client_factory=http_client.client, gg=gg
+            HitomiGalleryService, client_factory=http_client.client
         ),
         manga_cache=Provider(LocalMangaCache, cache_dir=".cache", missing_ok=True),
         manga_downloader=Provider(
-            HitomiMangaDownloader, client_factory=http_client.client
+            HitomiMangaDownloader, client_factory=http_client.client, gg=gg
         ),
         manga_storage=Provider(
             SqliteMangaStorage, session_factory=sqlite_database.session

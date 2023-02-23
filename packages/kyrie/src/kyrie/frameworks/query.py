@@ -12,7 +12,7 @@ class QueryContext(Context):
 class QueryHandler(BaseHandler[Query, QueryContext, View | None]):
     __target_type__ = Query
     __context_type__ = QueryContext
-    __result_type__ = View
+    __result_type__ = View | None
 
 
 class QueryBus(NamedTuple):

@@ -40,30 +40,29 @@ def wrap_with_container(
 @router.route("/")
 async def desktop_settings(page: flet.Page) -> None:
     view = flet.View(controls=[])
-
-    app_bar = flet.AppBar(
+    view.appbar = flet.AppBar(
         title=flet.Text("Settings"),
         bgcolor=flet.colors.SURFACE_VARIANT,
     )
-    view.controls.append(app_bar)
 
     async def change_refresh_on_startup(e: flet.ControlEvent) -> None:
         load_settings(page).refresh_on_startup = e.control.value
         await save_settings(page)
 
     async def refresh_metadata_only(_: flet.ControlEvent) -> None:
-        view = await query_bus().query(queries.GetLatestPool(language="all"))
+        view = await query_bus().query(
+            queries.GetLatestPool(language="all", offset=0, limit=100)
+        )
         if view is None:
-            print("No pool found")
             return
 
         pool = cast(views.PoolView, view)
-        for manga_id in pool.manga_ids:
-            await command_bus().dispatch(commands.FetchManga(manga_id=manga_id))
-            print(f"Manga '{manga_id}' fetched")
+        await command_bus().mdispatch(commands.FetchMangaUsingPool(pool_id=pool.id))
 
     async def refresh_metadata_and_pool(_: flet.ControlEvent) -> None:
-        await command_bus().dispatch(commands.FetchPool(language="all"))
+        await command_bus().dispatch(
+            commands.FetchPool(language="all", offset=0, limit=100)
+        )
         await refresh_metadata_only(_)
 
     async def click_refresh_pool_manually(_: flet.ControlEvent) -> None:
@@ -71,7 +70,9 @@ async def desktop_settings(page: flet.Page) -> None:
         txt_pool_status = flet.Text(size=20)
         column.controls.append(wrap_with_container(control=txt_pool_status))
 
-        view = await query_bus().query(queries.GetLatestPool(language="all"))
+        view = await query_bus().query(
+            queries.GetLatestPool(language="all", ofset=0, limit=100)
+        )
         if view is None:
             txt_pool_status.value = "No pool fetched"
         else:
@@ -207,7 +208,7 @@ async def desktop_settings(page: flet.Page) -> None:
     row = flet.Row(
         controls=[rail, flet.VerticalDivider(width=1), column],
         alignment=flet.MainAxisAlignment.START,
-        height=page.height,
+        height=page.height - 76,
     )
     view.controls.append(row)
 
@@ -218,12 +219,10 @@ async def desktop_settings(page: flet.Page) -> None:
 @router.route("/developer")
 async def desktop_developer_settings(page: flet.Page) -> None:
     view = flet.View(controls=[])
-
-    app_bar = flet.AppBar(
+    view.appbar = flet.AppBar(
         title=flet.Text("Developer Settings"),
         bgcolor=flet.colors.SURFACE_VARIANT,
     )
-    view.controls.append(app_bar)
 
     column = flet.Column()
     view.controls.append(column)
@@ -247,9 +246,7 @@ async def desktop_developer_settings(page: flet.Page) -> None:
     container = wrap_with_container()
 
     async def click_manga(manga_id: str, _: flet.ControlEvent) -> None:
-        print("started")
         await command_bus().dispatch(commands.CacheManga(manga_id=manga_id))
-        print("finished")
 
     async def txt_submit(e: flet.ControlEvent) -> None:
         nonlocal container
