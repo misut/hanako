@@ -1,24 +1,32 @@
 from hanako.domain.enums import MangaLanguage
+from hanako.domain.exceptions import (
+    DomainException,
+    PageCachedPathError,
+    PageNumberError,
+)
 from hanako.domain.manga import (
     Manga,
     MangaArtist,
-    MangaCached,
     MangaFetched,
     MangaPage,
+    MangaPageCached,
     MangaTag,
 )
 from hanako.domain.models import *
-from hanako.domain.pool import Pool, PoolFetched, PoolUpdated
+from hanako.domain.pool_entry import PoolEntry, PoolEntryFetched, PoolEntryUpdated
 
 __all__ = (
+    "DomainException",
     "MangaLanguage",
     "Manga",
     "MangaArtist",
-    "MangaCached",
     "MangaFetched",
     "MangaPage",
+    "MangaPageCached",
     "MangaTag",
-    "Pool",
-    "PoolFetched",
-    "PoolUpdated",
+    "PageCachedPathError",
+    "PageNumberError",
+    "PoolEntry",
+    "PoolEntryFetched",
+    "PoolEntryUpdated",
 )

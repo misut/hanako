@@ -18,6 +18,7 @@ class GalleryTag(ValueObject):
 
 class Gallery(ValueObject):
     id: IDType
+    language: str
     title: str
     thumbnail: str
     artists: list[GalleryArtist]

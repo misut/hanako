@@ -1,5 +1,4 @@
 import pathlib
-from collections.abc import Mapping, Sequence
 from datetime import datetime
 
 from kyrie.models import (
@@ -9,6 +8,13 @@ from kyrie.models import (
     Entity,
     IDType,
 )
+
+from hanako.domain.enums import MangaLanguage
+from hanako.domain.exceptions import PageNumberError, PageCachedPathError
+
+
+def __check_cached(page: "MangaPage") -> bool:
+    return page.cached_in is not None
 
 
 class MangaArtist(Entity):
@@ -33,38 +39,56 @@ class _MangaEvent(DomainEvent):
 
 
 class MangaFetched(_MangaEvent):
+    entity_id: IDType
     entity: "Manga"
 
 
-class MangaCached(_MangaEvent):
+class MangaPageCached(_MangaEvent):
+    entity_id: IDType
+    page_number: int
     cached_in: str
 
 
 class Manga(AggregateRoot):
     id: IDType
+    language: MangaLanguage
     title: str
     thumbnail: str
+    artists: list[MangaArtist]
     pages: list[MangaPage]
+    tags: list[MangaTag]
 
-    cached_in: str | None = None
-    fetched_at: datetime = DefaultDatetimeField
+    created_at: datetime = DefaultDatetimeField
     updated_at: datetime = DefaultDatetimeField
 
     @classmethod
-    def create(cls, **kwargs: object) -> MangaFetched:
+    def fetch(cls, **kwargs: object) -> MangaFetched:
         obj = cls(**kwargs)
         MangaFetched.update_forward_refs()
         return MangaFetched(entity_id=obj.id, entity=obj)
 
-    def cache(self, dir_path: str) -> MangaCached:
-        path = pathlib.Path(dir_path)
-        if path.is_file():
-            raise ValueError(f"'{path.name}' Not Directory")
+    def cache_page(self, page_number: int, file_path: str) -> MangaPageCached:
+        if not self.is_page_number_valid(page_number):
+            raise PageNumberError(f"Invalid Page Number '{page_number}'")
 
-        self.cached_in = dir_path
-        for page in self.pages:
-            page.cached_in = str(path.joinpath(page.filename))
-        return MangaCached(entity_id=self.id, cached_in=dir_path)
+        cached_path = pathlib.Path(file_path)
+        if cached_path.is_dir():
+            raise PageCachedPathError(f"'{cached_path.name}' Not File But Directory")
+
+        self.pages[page_number].cached_in = str(cached_path)
+        return MangaPageCached(
+            entity_id=self.id,
+            page_number=page_number,
+            cached_in=self.pages[page_number].cached_in,
+        )
 
     def is_cached(self) -> bool:
-        return self.cached_in is not None
+        return all(__check_cached(page) for page in self.pages)
+
+    def is_page_cached(self, page_number: int) -> bool:
+        if not self.is_page_number_valid(page_number):
+            raise PageNumberError(f"Invalid Page Number '{page_number}'")
+        return __check_cached(self.pages[page_number])
+
+    def is_page_number_valid(self, page_number: int) -> bool:
+        return 0 <= page_number < len(self.pages)
