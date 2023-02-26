@@ -6,6 +6,8 @@ from hanako.domain.enums import MangaLanguage
 
 
 class MangaPageView(View):
+    __entity_type__ = "MangaPage"
+
     filename: str
     cached_in: str | None
 
@@ -14,6 +16,7 @@ class MangaView(View):
     __entity_type__ = "Manga"
 
     id: IDType
+    language: str
     title: str
     thumbnail: str
     pages: list[MangaPageView]
@@ -25,13 +28,10 @@ class MangaView(View):
         return len(self.pages)
 
 
-class PoolView(View):
-    __entity_type__ = "Pool"
+class PoolEntryView(View):
+    __entity_type__ = "PoolEntry"
 
-    id: IDType
-    id_list: list[IDType]
+    manga_id: IDType
     language: MangaLanguage
-    offset: int
-    limit: int
     fetched_at: datetime
     updated_at: datetime

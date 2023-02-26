@@ -27,8 +27,7 @@ async def desktop_viewer(page: flet.Page, manga_id: IDType) -> None:
     page.splash = flet.ProgressRing()
     await page.update_async()
 
-    result = await command_bus().dispatch(commands.CacheManga(manga_id=manga_id))
-    assert isinstance(result, IDType)
+    await command_bus().mdispatch(commands.CacheManga(manga_id=manga_id))
     manga = await query_bus().query(queries.GetManga(manga_id=manga_id))
     assert manga is not None
     manga = cast(views.MangaView, manga)

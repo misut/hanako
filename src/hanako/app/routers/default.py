@@ -106,17 +106,13 @@ async def desktop_main(page: flet.Page) -> None:
     page.views.append(view)
     await page.update_async()
 
-    pool_id = await command_bus().dispatch(
+    manga_id_list = await command_bus().mdispatch(
         commands.FetchPool(language="korean", offset=0, limit=10)
     )
-    await command_bus().mdispatch(commands.FetchMangaUsingPool(pool_id=pool_id))
-
-    found = await query_bus().query(queries.GetPool(pool_id=pool_id))
-    assert found
-    pool = cast(views.PoolView, found)
+    await command_bus().mdispatch(commands.FetchMangaList(manga_id_list=manga_id_list))
 
     mangas: list[views.MangaView] = []
-    for manga_id in pool.id_list:
+    for manga_id in manga_id_list:
         manga = await query_bus().query(queries.GetManga(manga_id=manga_id))
         if manga is None:
             continue

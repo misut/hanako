@@ -10,8 +10,8 @@ from hanako.infrastructure import (
     SqliteDatabase,
     SqliteMangaRepository,
     SqliteMangaStorage,
-    SqlitePoolRepository,
-    SqlitePoolStorage,
+    SqlitePoolEntryRepository,
+    SqlitePoolEntryStorage,
 )
 from hanako.infrastructure.local_manga_cache import LocalMangaCache
 from hanako.query import HanakoQueryContext, query_handler
@@ -36,8 +36,8 @@ async def initialize_dependencies() -> None:
         manga_storage=Provider(
             SqliteMangaStorage, session_factory=sqlite_database.session
         ),
-        pool_storage=Provider(
-            SqlitePoolStorage, session_factory=sqlite_database.session
+        pool_entry_storage=Provider(
+            SqlitePoolEntryStorage, session_factory=sqlite_database.session
         ),
     )
     initialize_command_bus(command_context, command_handler, event_handler)
@@ -46,8 +46,8 @@ async def initialize_dependencies() -> None:
         manga_repository=Provider(
             SqliteMangaRepository, session_factory=sqlite_database.session
         ),
-        pool_repository=Provider(
-            SqlitePoolRepository, session_factory=sqlite_database.session
+        pool_entry_repository=Provider(
+            SqlitePoolEntryRepository, session_factory=sqlite_database.session
         ),
     )
     initialize_query_bus(query_context, query_handler)

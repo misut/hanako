@@ -10,10 +10,10 @@ from kyrie.models import (
 )
 
 from hanako.domain.enums import MangaLanguage
-from hanako.domain.exceptions import PageNumberError, PageCachedPathError
+from hanako.domain.exceptions import PageCachedPathError, PageNumberError
 
 
-def __check_cached(page: "MangaPage") -> bool:
+def _check_cached(page: "MangaPage") -> bool:
     return page.cached_in is not None
 
 
@@ -39,12 +39,10 @@ class _MangaEvent(DomainEvent):
 
 
 class MangaFetched(_MangaEvent):
-    entity_id: IDType
     entity: "Manga"
 
 
 class MangaPageCached(_MangaEvent):
-    entity_id: IDType
     page_number: int
     cached_in: str
 
@@ -58,7 +56,7 @@ class Manga(AggregateRoot):
     pages: list[MangaPage]
     tags: list[MangaTag]
 
-    created_at: datetime = DefaultDatetimeField
+    fetched_at: datetime = DefaultDatetimeField
     updated_at: datetime = DefaultDatetimeField
 
     @classmethod
@@ -83,12 +81,12 @@ class Manga(AggregateRoot):
         )
 
     def is_cached(self) -> bool:
-        return all(__check_cached(page) for page in self.pages)
+        return all(_check_cached(page) for page in self.pages)
 
     def is_page_cached(self, page_number: int) -> bool:
         if not self.is_page_number_valid(page_number):
             raise PageNumberError(f"Invalid Page Number '{page_number}'")
-        return __check_cached(self.pages[page_number])
+        return _check_cached(self.pages[page_number])
 
     def is_page_number_valid(self, page_number: int) -> bool:
         return 0 <= page_number < len(self.pages)

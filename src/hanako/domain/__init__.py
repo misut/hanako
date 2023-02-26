@@ -13,7 +13,7 @@ from hanako.domain.manga import (
     MangaTag,
 )
 from hanako.domain.models import *
-from hanako.domain.pool_entry import PoolEntry, PoolEntryFetched, PoolEntryUpdated
+from hanako.domain.pool_entry import PoolEntry, PoolEntryFetched
 
 __all__ = (
     "DomainException",
@@ -28,5 +28,4 @@ __all__ = (
     "PageNumberError",
     "PoolEntry",
     "PoolEntryFetched",
-    "PoolEntryUpdated",
 )

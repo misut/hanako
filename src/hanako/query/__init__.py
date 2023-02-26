@@ -1,11 +1,10 @@
-from hanako.query.context import HanakoQueryContext, MangaRepository
+from hanako.query.context import HanakoQueryContext
 from hanako.query.queries import query_handler
-from hanako.query.views import MangaView, PoolView
+from hanako.query.views import MangaView, PoolEntryView
 
 __all__ = (
     "HanakoQueryContext",
-    "MangaRepository",
     "MangaView",
-    "PoolView",
+    "PoolEntryView",
     "query_handler",
 )
