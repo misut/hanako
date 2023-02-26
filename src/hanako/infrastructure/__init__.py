@@ -6,9 +6,12 @@ from hanako.infrastructure.local_filesystem import LocalFilesystem
 from hanako.infrastructure.sqlite_database import SqliteDatabase
 from hanako.infrastructure.sqlite_repository import (
     SqliteMangaRepository,
-    SqlitePoolRepository,
+    SqlitePoolEntryRepository,
 )
-from hanako.infrastructure.sqlite_storage import SqliteMangaStorage, SqlitePoolStorage
+from hanako.infrastructure.sqlite_storage import (
+    SqliteMangaStorage,
+    SqlitePoolEntryStorage,
+)
 
 __all__ = (
     "FileExporter",
@@ -21,8 +24,8 @@ __all__ = (
     "SqliteDatabase",
     "SqliteMangaRepository",
     "SqliteMangaStorage",
-    "SqlitePoolRepository",
-    "SqlitePoolStorage",
+    "SqlitePoolEntryRepository",
+    "SqlitePoolEntryStorage",
     "SqlMangaRepository",
     "SqlMangaStorage",
 )

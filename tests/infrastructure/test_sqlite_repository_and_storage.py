@@ -1,6 +1,6 @@
 import pytest
 
-from hanako.domain import Manga
+from hanako import domain
 from hanako.infrastructure import (
     SqliteDatabase,
     SqliteMangaRepository,
@@ -14,8 +14,16 @@ async def test_manga(db: SqliteDatabase) -> None:
     store = SqliteMangaStorage(db.session)
 
     expected = [
-        Manga(id="test_1", title="test manga #1", thumbnail="image#1", pages=[]),
-        Manga(id="test_2", title="test manga #2", thumbnail="image#2", pages=[]),
+        domain.Manga(
+            id=f"test_{n}",
+            language="korean",
+            title=f"test manga #{n}",
+            thumbnail=f"image#{n}",
+            artists=[],
+            pages=[],
+            tags=[],
+        )
+        for n in range(2)
     ]
     await store.save_one(expected[0])
     result = await repo.find_one(id=expected[0].id)

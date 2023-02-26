@@ -102,6 +102,7 @@ class HitomiGalleryService(GalleryService):
             [
                 domain.Gallery(
                     id=gallery.id,
+                    language=gallery.language,
                     title=gallery.title,
                     thumbnail=thumbnail,
                     artists=[domain.GalleryArtist(**a.dict()) for a in gallery.artists],

@@ -1,33 +1,46 @@
+import abc
 from datetime import datetime
 
-from sqlalchemy import JSON, Column, DateTime, Enum, Integer, String, Text, orm
+from sqlalchemy import JSON, DateTime, Enum, String, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from hanako.domain import MangaLanguage
 
-BaseOrm = orm.declarative_base()
+
+class BaseOrm(DeclarativeBase):
+    pass
 
 
 class MangaOrm(BaseOrm):
     __tablename__ = "manga"
 
-    id: str = Column(String(16), primary_key=True)
-    title: str = Column(String(256), index=True, nullable=False)
-    thumbnail: str = Column(Text, nullable=False)
-    pages: list[dict[str, bool | str | None]] = Column(JSON, nullable=False)
+    id: Mapped[str] = mapped_column(String(16), primary_key=True)
+    language: Mapped[MangaLanguage] = mapped_column(
+        Enum(MangaLanguage), index=True, nullable=False
+    )
+    title: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
+    thumbnail: Mapped[str] = mapped_column(Text, nullable=False)
+    artists: Mapped[list[dict[str, bool | str | None]]] = mapped_column(
+        JSON, nullable=False
+    )
+    pages: Mapped[list[dict[str, bool | str | None]]] = mapped_column(
+        JSON, nullable=False
+    )
+    tags: Mapped[list[dict[str, bool | str | None]]] = mapped_column(
+        JSON, nullable=False
+    )
 
-    cached_in: str = Column(String(256), nullable=True)
-    fetched_at: datetime = Column(DateTime, nullable=False)
-    updated_at: datetime = Column(DateTime, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
 
-class PoolOrm(BaseOrm):
-    __tablename__ = "pool"
+class PoolEntryOrm(BaseOrm):
+    __tablename__ = "pool_entry"
 
-    id: str = Column(String(36), primary_key=True)
-    id_list: set[str] = Column(JSON, nullable=False)
-    language: MangaLanguage = Column(Enum(MangaLanguage), index=True, nullable=False)
-    offset: int = Column(Integer, index=True, nullable=False)
-    limit: int = Column(Integer, index=True, nullable=False)
+    manga_id: Mapped[str] = mapped_column(String(16), primary_key=True)
+    language: Mapped[MangaLanguage] = mapped_column(
+        Enum(MangaLanguage), index=True, nullable=False
+    )
 
-    fetched_at: datetime = Column(DateTime, nullable=False)
-    updated_at: datetime = Column(DateTime, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)

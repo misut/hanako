@@ -3,6 +3,7 @@ from collections.abc import Sequence
 import pytest
 import pytest_asyncio
 
+from hanako import domain
 from hanako.infrastructure import HitomiGalleryService, HttpClient
 
 
@@ -15,7 +16,7 @@ async def initialize_hitomi_gallery_service() -> HitomiGalleryService:
 @pytest.mark.asyncio
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "language,offset,limit",
+    ["language", "offset", "limit"],
     [
         ("all", 0, 10),
         ("english", 0, 10),
@@ -32,7 +33,7 @@ async def test_fetch_galleries_ids(
 @pytest.mark.asyncio
 @pytest.mark.slow
 @pytest.mark.parametrize(
-    "expected_ids,expected_titles",
+    ["expected_ids", "expected_titles"],
     [
         (
             ("1927583", "2280632", "2418097"),

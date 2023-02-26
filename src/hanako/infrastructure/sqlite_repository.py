@@ -7,8 +7,8 @@ from kyrie.models import View
 from sqlalchemy import select
 from sqlalchemy.ext import asyncio as aiosqlalchemy
 
-from hanako.infrastructure.orm import BaseOrm, MangaOrm, PoolOrm
-from hanako.query import MangaView, PoolView
+from hanako.infrastructure.orm import BaseOrm, MangaOrm, PoolEntryOrm
+from hanako.query import MangaView, PoolEntryView
 
 Obj = TypeVar("Obj", bound=View)
 ObjType = type[Obj]
@@ -60,6 +60,7 @@ class SqliteMangaRepository(SqliteRepository[MangaView, MangaOrm]):
     def orm_to_obj(self, orm: MangaOrm) -> MangaView:
         return MangaView(
             id=orm.id,
+            language=orm.language,
             title=orm.title,
             thumbnail=orm.thumbnail,
             pages=orm.pages,
@@ -68,17 +69,14 @@ class SqliteMangaRepository(SqliteRepository[MangaView, MangaOrm]):
         )
 
 
-class SqlitePoolRepository(SqliteRepository[PoolView, PoolOrm]):
-    __obj_type__ = PoolView
-    __orm_type__ = PoolOrm
+class SqlitePoolEntryRepository(SqliteRepository[PoolEntryView, PoolEntryOrm]):
+    __obj_type__ = PoolEntryView
+    __orm_type__ = PoolEntryOrm
 
-    def orm_to_obj(self, orm: PoolOrm) -> PoolView:
-        return PoolView(
-            id=orm.id,
-            id_list=orm.id_list,
+    def orm_to_obj(self, orm: PoolEntryOrm) -> PoolEntryView:
+        return PoolEntryView(
+            manga_id=orm.manga_id,
             language=orm.language,
-            offset=orm.offset,
-            limit=orm.limit,
             fetched_at=orm.fetched_at,
             updated_at=orm.updated_at,
         )

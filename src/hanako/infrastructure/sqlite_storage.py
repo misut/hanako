@@ -8,8 +8,8 @@ from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.ext import asyncio as aiosqlalchemyorm
 
-from hanako.domain import Manga, Pool
-from hanako.infrastructure.orm import BaseOrm, MangaOrm, PoolOrm
+from hanako import domain
+from hanako.infrastructure.orm import BaseOrm, MangaOrm, PoolEntryOrm
 
 Obj = TypeVar("Obj", bound=Entity)
 Orm = TypeVar("Orm", bound=BaseOrm)
@@ -18,6 +18,7 @@ Orm = TypeVar("Orm", bound=BaseOrm)
 class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
     __obj_type__: ClassVar[type[Obj]]  # type: ignore
     __orm_type__: ClassVar[type[Orm]]  # type: ignore
+    __primary_key__: ClassVar[str]
 
     _session_factory: Callable[..., aiosqlalchemyorm.AsyncSession]
 
@@ -45,8 +46,8 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
         stmt = insert(self.__orm_type__)
         stmt = stmt.values([entity.dict() for entity in entities])
         stmt = stmt.on_conflict_do_update(
-            index_elements=[getattr(self.__orm_type__, "id")],
-            set_={k: v for k, v in stmt.excluded.items() if k != "id"},
+            index_elements=[getattr(self.__orm_type__, self.__primary_key__)],
+            set_={k: v for k, v in stmt.excluded.items() if k != self.__primary_key__},
         )
 
         async with self._session_factory() as session:
@@ -55,26 +56,28 @@ class SqliteStorage(Storage[Obj], Generic[Obj, Orm]):
 
     async def save_one(self, entity: Obj) -> None:
         stmt = select(self.__orm_type__)
-        stmt = stmt.filter_by(id=getattr(entity, "id"))
+        stmt = stmt.filter_by(id=getattr(entity, self.__primary_key__))
 
         async with self._session_factory() as session:
             result = await session.execute(stmt)
             orm = result.scalar()
             if orm is None:
                 orm = self.__orm_type__()
-                setattr(orm, "id", getattr(entity, "id"))
+                setattr(orm, "id", getattr(entity, self.__primary_key__))
                 session.add(orm)
 
-            for k, v in entity.dict(exclude={"id"}).items():
+            for k, v in entity.dict(exclude={self.__primary_key__}).items():
                 setattr(orm, k, v)
             await session.commit()
 
 
-class SqliteMangaStorage(SqliteStorage[Manga, MangaOrm]):
-    __obj_type__ = Manga
+class SqliteMangaStorage(SqliteStorage[domain.Manga, MangaOrm]):
+    __obj_type__ = domain.Manga
     __orm_type__ = MangaOrm
+    __primary_key__ = "id"
 
 
-class SqlitePoolStorage(SqliteStorage[Pool, PoolOrm]):
-    __obj_type__ = Pool
-    __orm_type__ = PoolOrm
+class SqlitePoolEntryStorage(SqliteStorage[domain.PoolEntry, PoolEntryOrm]):
+    __obj_type__ = domain.PoolEntry
+    __orm_type__ = PoolEntryOrm
+    __primary_key__ = "manga_id"
