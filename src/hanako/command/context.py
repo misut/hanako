@@ -1,4 +1,3 @@
-import abc
 from dataclasses import dataclass
 
 from kyrie.context import Provider
@@ -11,7 +10,7 @@ from hanako.command.manga_cache import MangaCache
 from hanako.command.manga_downloader import MangaDownloader
 
 MangaStorage = Storage[domain.Manga]
-PoolStorage = Storage[domain.Pool]
+PoolEntryStorage = Storage[domain.PoolEntry]
 
 
 @dataclass(frozen=True)
@@ -20,4 +19,4 @@ class HanakoCommandContext(CommandContext):
     manga_cache: Provider[MangaCache]
     manga_downloader: Provider[MangaDownloader]
     manga_storage: Provider[MangaStorage]
-    pool_storage: Provider[PoolStorage]
+    pool_entry_storage: Provider[PoolEntryStorage]

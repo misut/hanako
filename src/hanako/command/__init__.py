@@ -1,11 +1,14 @@
-from hanako.command.context import HanakoCommandContext, MangaStorage, PoolStorage
+from hanako.command.context import HanakoCommandContext, MangaStorage, PoolEntryStorage
 from hanako.command.events import event_handler
 from hanako.command.exceptions import (
     CommandException,
     DownloadError,
     FetchError,
     GalleryServiceException,
+    MangaCacheException,
     MangaDownloaderException,
+    ReadError,
+    WriteError,
 )
 from hanako.command.gallery_service import GalleryService
 from hanako.command.handler import command_handler
@@ -20,10 +23,13 @@ __all__ = (
     "GalleryServiceException",
     "HanakoCommandContext",
     "MangaCache",
+    "MangaCacheException",
     "MangaDownloader",
     "MangaDownloaderException",
     "MangaStorage",
-    "PoolStorage",
+    "PoolEntryStorage",
+    "ReadError",
+    "WriteError",
     "command_handler",
     "event_handler",
 )

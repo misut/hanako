@@ -10,6 +10,18 @@ class FetchError(GalleryServiceException):
     ...
 
 
+class MangaCacheException(CommandException):
+    ...
+
+
+class ReadError(MangaCacheException):
+    ...
+
+
+class WriteError(MangaCacheException):
+    ...
+
+
 class MangaDownloaderException(CommandException):
     ...
 

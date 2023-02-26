@@ -2,9 +2,10 @@ from kyrie.models import Command, IDType, MultiCommand
 
 __all__ = (
     "CacheManga",
+    "CacheMangaPage",
     "FetchManga",
+    "FetchMangaList",
     "FetchPool",
-    "UpdatePool",
 )
 
 
@@ -12,21 +13,20 @@ class FetchManga(Command):
     manga_id: IDType
 
 
-class FetchMangaUsingPool(MultiCommand):
-    pool_id: IDType
-    offset: int = 0
-    limit: int = 0
+class FetchMangaList(MultiCommand):
+    manga_id_list: list[IDType]
 
 
-class CacheManga(Command):
+class CacheManga(MultiCommand):
     manga_id: IDType
 
 
-class FetchPool(Command):
+class CacheMangaPage(Command):
+    manga_id: IDType
+    page_number: int
+
+
+class FetchPool(MultiCommand):
     language: str
     offset: int = 0
     limit: int = 0
-
-
-class UpdatePool(Command):
-    pool_id: IDType
